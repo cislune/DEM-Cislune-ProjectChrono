@@ -1,4 +1,4 @@
-# Setup Instructions for PyChrono and PyDEME
+# Setup Instructions for PyChrono and PyDEME (Ubuntu)
 
 This document explains how to install the required software, prepare the environment, and verify required assets for this project.
 
