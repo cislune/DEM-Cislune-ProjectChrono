@@ -297,3 +297,70 @@ SLIP_VALUES_st = np.linspace(0.0, 0.6, 3)
 
 WHEEL_ANG_VEL_st = np.pi / 2
 # prescribed wheel angular velocity (rad/s)
+
+
+# ----------------------------------------------------------------------------------------------------------------------------
+# BUCKET DRUM EXCAVATION OUTPUT PATHS
+# ----------------------------------------------------------------------------------------------------------------------------
+
+BUCKET_DRUM_OUT_DIR = "./bucket drum excavation output"
+# root directory where bucket drum excavation outputs are written
+
+BUCKET_DRUM_TERRAIN_FILE_NAME = "bucket_drum_terrain_motion"
+# time-resolved terrain particle positions during bucket drum excavation
+
+BUCKET_DRUM_MOTION_FILE_NAME = "bucket_drum_motion"
+# time-resolved bucket drum mesh motion written as VTK
+
+BUCKET_DRUM_CONTACT_FILE_NAME = "bucket_drum_contact_data"
+# time-resolved bucket drum-terrain contact data
+
+BUCKET_DRUM_RESPONSE_FILE_NAME = "bucket_drum_response_data"
+# processed bucket drum response data, including position, velocity, force, torque proxy, and power proxy
+
+BUCKET_DRUM_SETTLED_FILE_NAME = "bucket_drum_settled_data"
+# final terrain state after bucket drum excavation
+
+
+# ----------------------------------------------------------------------------------------------------------------------------
+# BUCKET DRUM EXCAVATION CONFIGURATION
+# ----------------------------------------------------------------------------------------------------------------------------
+
+BUCKET_DRUM_OBJ_FILE_st = "bucketdrum.obj"
+# bucket drum mesh file; put this OBJ in the project folder or replace with a relative path
+
+BUCKET_DRUM_RADIUS_st = 0.15
+# approximate bucket drum radius (m)
+
+BUCKET_DRUM_WIDTH_st = 0.25
+# approximate bucket drum width (m)
+
+BUCKET_DRUM_MASS_st = 12.0
+# bucket drum mass (kg)
+
+BUCKET_DRUM_IYY_st = BUCKET_DRUM_MASS_st * ((BUCKET_DRUM_RADIUS_st ** 2) / 2.0)
+# approximate spin-axis inertia for the bucket drum
+
+BUCKET_DRUM_IXX_st = (BUCKET_DRUM_MASS_st / 12.0) * ((3.0 * (BUCKET_DRUM_RADIUS_st ** 2)) + (BUCKET_DRUM_WIDTH_st ** 2))
+# approximate transverse inertia for the bucket drum
+
+BUCKET_DRUM_ANG_VEL_st = 2.0 * np.pi * 20.0 / 60.0
+# bucket drum angular velocity (rad/s); currently equivalent to 20 rpm
+
+BUCKET_DRUM_TRAVEL_SPEED_st = 0.05
+# forward excavation speed (m/s)
+
+BUCKET_DRUM_CUT_DEPTH_st = 0.05
+# initial embedment / cutting depth below the settled terrain surface (m)
+
+TRIAL_RUN_TIME_BUCKET_DRUM_st = 8.0
+# duration of bucket drum excavation simulation (s)
+
+MU_contact_bucket_drum_st = 0.8
+# bucket drum-terrain friction coefficient
+
+COR_contact_bucket_drum_st = 0.6
+# bucket drum-terrain coefficient of restitution
+
+COHESION_contact_bucket_drum_st = 50.0
+# bucket drum-terrain cohesive contact strength
