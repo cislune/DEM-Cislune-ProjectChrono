@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cislune/DEM-Cislune-ProjectChrono/schemas/wheel_test_record.schema.json",
+  "title": "GRASP Controlled Wheel Test Record",
+  "description": "Common metadata and results record for DEM, CRATR, RIDER, and geotechnical wheel tests.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_id",
+    "record_status",
+    "context",
+    "wheel",
+    "simulant",
+    "loading",
+    "kinematics",
+    "instrumentation",
+    "results",
+    "files",
+    "quality"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "record_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$"},
+    "record_status": {"enum": ["planned", "accepted", "rejected"]},
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["campaign_id", "facility", "test_date", "operator", "objective"],
+      "properties": {
+        "campaign_id": {"type": "string"},
+        "facility": {"enum": ["DEM", "CRATR", "RIDER", "other"]},
+        "test_date": {"type": "string", "format": "date"},
+        "operator": {"type": "string"},
+        "objective": {"type": "string"}
+      }
+    },
+    "wheel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["design_id", "revision", "obj_sha256", "scale_factor", "material", "rolling_radius_m", "envelope_radius_m", "width_m", "mass_kg", "inertia_basis", "mount_orientation"],
+      "properties": {
+        "design_id": {"type": "string"},
+        "revision": {"type": "string"},
+        "obj_sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+        "scale_factor": {"type": "number", "exclusiveMinimum": 0},
+        "material": {"type": "string"},
+        "rolling_radius_m": {"type": "number", "exclusiveMinimum": 0},
+        "envelope_radius_m": {"type": "number", "exclusiveMinimum": 0},
+        "width_m": {"type": "number", "exclusiveMinimum": 0},
+        "mass_kg": {"type": "number", "exclusiveMinimum": 0},
+        "inertia_basis": {"type": "string"},
+        "mount_orientation": {"type": "string"}
+      }
+    },
+    "simulant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["material_id", "lot_id", "dry_mass_kg", "moisture_mass_fraction", "bin_length_m", "bin_width_m", "fill_depth_m", "preparation_method", "reset_method", "initial_state"],
+      "properties": {
+        "material_id": {"type": "string"},
+        "lot_id": {"type": "string"},
+        "dry_mass_kg": {"type": "number", "exclusiveMinimum": 0},
+        "moisture_mass_fraction": {"type": "number", "minimum": 0, "maximum": 1},
+        "particle_density_kg_m3": {"type": "number", "exclusiveMinimum": 0},
+        "bin_length_m": {"type": "number", "exclusiveMinimum": 0},
+        "bin_width_m": {"type": "number", "exclusiveMinimum": 0},
+        "fill_depth_m": {"type": "number", "exclusiveMinimum": 0},
+        "preparation_method": {"type": "string"},
+        "reset_method": {"type": "string"},
+        "initial_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["surface_profile_file", "bulk_density_kg_m3", "geotech_measurements"],
+          "properties": {
+            "surface_profile_file": {"type": "string"},
+            "bulk_density_kg_m3": {"type": "number", "exclusiveMinimum": 0},
+            "geotech_measurements": {"type": "array", "items": {"$ref": "#/$defs/geotechMeasurement"}}
+          }
+        }
+      }
+    },
+    "loading": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["normal_load_target_n", "normal_load_mean_n", "normal_load_tolerance_fraction", "within_tolerance"],
+      "properties": {
+        "normal_load_target_n": {"type": "number", "exclusiveMinimum": 0},
+        "normal_load_mean_n": {"type": "number", "exclusiveMinimum": 0},
+        "normal_load_tolerance_fraction": {"type": "number", "minimum": 0, "maximum": 0.05},
+        "within_tolerance": {"type": "boolean"}
+      }
+    },
+    "kinematics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "linear_speed_target_m_s", "linear_speed_mean_m_s", "angular_speed_mean_rad_s", "slip_definition", "slip_target", "slip_mean", "passes", "travel_distance_m"],
+      "properties": {
+        "mode": {"enum": ["fixed_linear_speed", "fixed_angular_speed", "free_rolling"]},
+        "linear_speed_target_m_s": {"type": "number", "minimum": 0},
+        "linear_speed_mean_m_s": {"type": "number", "minimum": 0},
+        "angular_speed_mean_rad_s": {"type": "number"},
+        "slip_definition": {"const": "1 - v/(omega*rolling_radius)"},
+        "slip_target": {"type": "number"},
+        "slip_mean": {"type": "number"},
+        "passes": {"type": "integer", "minimum": 1},
+        "travel_distance_m": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "instrumentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sensors", "time_sync_method"],
+      "properties": {
+        "sensors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sensor_id", "quantity", "units", "calibration_date", "sample_rate_hz"],
+            "properties": {
+              "sensor_id": {"type": "string"},
+              "quantity": {"type": "string"},
+              "units": {"type": "string"},
+              "calibration_date": {"type": "string", "format": "date"},
+              "sample_rate_hz": {"type": "number", "exclusiveMinimum": 0}
+            }
+          }
+        },
+        "time_sync_method": {"type": "string"}
+      }
+    },
+    "results": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sinkage_mean_m", "torque_mean_nm", "energy_per_distance_j_m", "post_state"],
+      "properties": {
+        "sinkage_mean_m": {"type": "number"},
+        "torque_mean_nm": {"type": "number"},
+        "drawbar_pull_mean_n": {"type": ["number", "null"]},
+        "energy_per_distance_j_m": {"type": "number", "minimum": 0},
+        "transported_volume_m3": {"type": ["number", "null"]},
+        "lateral_disturbance_m3": {"type": ["number", "null"]},
+        "post_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["surface_profile_file", "geotech_measurements"],
+          "properties": {
+            "surface_profile_file": {"type": "string"},
+            "bulk_density_kg_m3": {"type": ["number", "null"]},
+            "geotech_measurements": {"type": "array", "items": {"$ref": "#/$defs/geotechMeasurement"}}
+          }
+        }
+      }
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest", "raw_data", "video", "hashes"],
+      "properties": {
+        "manifest": {"type": "string"},
+        "raw_data": {"type": "array", "items": {"type": "string"}},
+        "video": {"type": ["string", "null"]},
+        "hashes": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"}}
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["preflight_status", "load_gate", "time_sync_gate", "run_health", "rejection_reason", "reviewer"],
+      "properties": {
+        "preflight_status": {"enum": ["PASS", "FAIL", "not_applicable"]},
+        "load_gate": {"enum": ["PASS", "FAIL"]},
+        "time_sync_gate": {"enum": ["PASS", "FAIL"]},
+        "run_health": {"enum": ["PASS", "FAIL"]},
+        "rejection_reason": {"type": ["string", "null"]},
+        "reviewer": {"type": "string"}
+      }
+    }
+  },
+  "$defs": {
+    "geotechMeasurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "x_m", "y_m", "value", "units"],
+      "properties": {
+        "method": {"enum": ["CPT", "density", "other"]},
+        "x_m": {"type": "number"},
+        "y_m": {"type": "number"},
+        "value": {"type": "number"},
+        "units": {"type": "string"}
+      }
+    }
+  }
+}

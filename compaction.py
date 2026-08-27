@@ -14,7 +14,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 # absolute path to the directory containing this compaction script
 # used as the root reference so that all other project paths remain relative and portable
 
-OUTPUT_ROOT = PROJECT_ROOT / "DEM-Calibration-Project-Chrono"
+OUTPUT_ROOT = Path(getattr(c, "COMPACTION_OUT_DIR", PROJECT_ROOT / "DEM-Calibration-Project-Chrono"))
 OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 # directory where all post-processing outputs from this script will be written
 # includes per-slip overlay maps, aggregated CSVs, and cross-slip comparison outputs
@@ -40,7 +40,7 @@ SLIP_WHEEL_MOTION_SUBDIR = getattr(c, "SLIP_SINKAGE_WHEEL_MOTION_SUBDIR", "wheel
 # subdirectory names inside each slip case folder
 # FIXED: slip-sinkage outputs are nested under Trial X / Slip Y / {terrain motion, wheel motion, ...}
 
-WHEEL_LABEL = "TREAD Coupon Wheel"
+WHEEL_LABEL = getattr(c, "WHEEL_LABEL_st", "TREAD Coupon Wheel")
 # descriptive label used in plot titles, legends, and summary file names
 
 
