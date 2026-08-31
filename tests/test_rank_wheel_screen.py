@@ -33,6 +33,13 @@ def test_canonical_name_handles_calibration_suffix():
     assert canonical_wheel_name("screen-smooth_control-coarse-cpt-informed") == "smooth_control"
 
 
+def test_canonical_name_handles_shared_bed_suffix():
+    assert (
+        canonical_wheel_name("screen-smooth_control-coarse-cpt-informed-shared-bed")
+        == "smooth_control"
+    )
+
+
 def test_positive_compaction_beats_dilation(tmp_path):
     write_case(tmp_path, "screen-smooth_control-coarse-cpt-informed", 1.0, 1.0, 1.0)
     write_case(tmp_path, "screen-compactor-coarse-cpt-informed", 3.0, 3.0, 1.1)

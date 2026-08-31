@@ -12,7 +12,7 @@ from pathlib import Path
 
 def canonical_wheel_name(case_id: str) -> str:
     name = case_id.removeprefix("screen-")
-    for suffix in ("-cpt-informed", "-coarse"):
+    for suffix in ("-shared-bed", "-cpt-informed", "-coarse"):
         name = name.removesuffix(suffix)
     return name
 
