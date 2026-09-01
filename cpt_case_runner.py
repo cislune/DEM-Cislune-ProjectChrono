@@ -319,6 +319,7 @@ def run_terrain(project_root: Path, config: Any, paths: dict[str, Path], overwri
                     "post_release_bulk_density_kg_m3": imported_preparation.get(
                         "post_release_bulk_density_kg_m3"
                     ),
+                    "random_seed": imported_preparation.get("random_seed"),
                 }
             )
         (paths["terrain"] / "terrain_preparation.json").write_text(

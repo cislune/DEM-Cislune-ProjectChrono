@@ -32,7 +32,8 @@ def prepare_manifest(
 ) -> Path:
     source_path, case = find_smooth_manifest(queue_path)
     case = copy.deepcopy(case)
-    case["case_id"] = "wheel-shared-bed-r4mm-cpt-informed"
+    seed_suffix = "" if random_seed == 77 else f"-seed{random_seed}"
+    case["case_id"] = f"wheel-shared-bed-r4mm-cpt-informed{seed_suffix}"
     case["model_status"] = "cpt_informed_shared_bed_preparation"
     case["purpose"] = (
         "Prepare one reproducible wheel-scale 4 mm bed for the accelerated comparative screen. "
@@ -66,6 +67,7 @@ def screen_queue(
     preparation = json.loads(preparation_path.read_text())
     target = preparation.get("target_bulk_density_kg_m3")
     achieved = preparation.get("post_release_bulk_density_kg_m3")
+    random_seed = int(preparation.get("random_seed", 77))
     if target is None or achieved is None:
         raise ValueError("Wheel bed preparation lacks target or achieved bulk density")
 
@@ -77,6 +79,8 @@ def screen_queue(
             source = project_root / source
         case = copy.deepcopy(json.loads(source.read_text()))
         case["case_id"] += "-shared-bed"
+        if random_seed != 77:
+            case["case_id"] += f"-seed{random_seed}"
         case["model_status"] = "cpt_informed_fixed_realization_wheel_screen"
         case["terrain"]["initial_state_csv"] = str(
             runtime_source_state or source_state.resolve()
@@ -90,6 +94,7 @@ def screen_queue(
             "target_bulk_density_kg_m3": target,
             "post_release_bulk_density_kg_m3": achieved,
             "achieved_to_target_ratio": float(achieved) / float(target),
+            "random_seed": random_seed,
         }
         destination = output_dir / f"{case['case_id']}.json"
         destination.write_text(json.dumps(case, indent=2, sort_keys=True) + "\n")

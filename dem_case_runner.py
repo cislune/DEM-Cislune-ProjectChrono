@@ -695,6 +695,7 @@ def run_terrain(project_root: Path, config: Any, paths: dict[str, Path], overwri
                 "source_preparation_sha256",
                 "target_bulk_density_kg_m3",
                 "post_release_bulk_density_kg_m3",
+                "random_seed",
             ):
                 if key in imported_preparation:
                     preparation[key] = imported_preparation[key]

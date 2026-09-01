@@ -214,6 +214,7 @@ while t < settle_time:
 preparation = {
     "generated_particle_count": num_particle,
     "generated_particle_mass_kg": generated_mass,
+    "random_seed": SEED,
     "target_bulk_density_kg_m3": target_bulk_density,
 }
 settled_path = os.path.join(
