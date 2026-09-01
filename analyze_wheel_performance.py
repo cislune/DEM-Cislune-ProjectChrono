@@ -105,6 +105,7 @@ def lane_metrics(
     x_min: float,
     x_max: float,
     half_width: float,
+    minimum_particles: int = 10,
 ) -> dict[str, float | int]:
     if len(initial) != len(final):
         raise ValueError("Initial and final particle counts differ")
@@ -113,8 +114,13 @@ def lane_metrics(
         for index, (x, y, _) in enumerate(initial)
         if x_min <= x <= x_max and abs(y) <= half_width
     ]
-    if len(indices) < 10:
-        raise ValueError("Too few particles in the wheel lane for compaction metrics")
+    if minimum_particles < 2:
+        raise ValueError("minimum_particles must be at least 2")
+    if len(indices) < minimum_particles:
+        raise ValueError(
+            "Too few particles in the wheel lane for compaction metrics: "
+            f"found {len(indices)}, require {minimum_particles}"
+        )
     initial_z = [initial[index][2] for index in indices]
     final_z = [final[index][2] for index in indices]
     initial_height = quantile(initial_z, 0.95) - quantile(initial_z, 0.05)
@@ -134,6 +140,7 @@ def lane_metrics(
 
 def analyze(case_dir: Path) -> dict:
     manifest = json.loads((case_dir / "frozen_case.json").read_text())
+    analysis_policy = manifest.get("analysis", {})
     case_id = manifest["case_id"]
     slip = float(manifest["test"]["slip_ratios"][0])
     slip_label = f"{slip:.6f}".rstrip("0").rstrip(".")
@@ -178,7 +185,14 @@ def analyze(case_dir: Path) -> dict:
     )
     initial = read_particles(input_path)
     final = read_particles(final_path)
-    lane = lane_metrics(initial, final, travel_min, travel_max, half_width)
+    lane = lane_metrics(
+        initial,
+        final,
+        travel_min,
+        travel_max,
+        half_width,
+        int(analysis_policy.get("minimum_lane_particles", 10)),
+    )
     normal_load = float(manifest["test"]["normal_load_n"])
     torque_values = [float(item["torque_y_nm"]) for item in active]
     drawbar_values = [float(item["force_x_n"]) for item in active]
@@ -187,7 +201,10 @@ def analyze(case_dir: Path) -> dict:
         "schema_version": 1,
         "case_id": case_id,
         "model_status": manifest.get("model_status"),
+        "source_model_status": manifest.get("source_model_status"),
         "status": "PASS_COMPARATIVE_METRICS" if active else "REJECT_NO_WHEEL_CONTACT",
+        "analysis_policy": analysis_policy,
+        "warnings": [],
         "passes_analyzed": len(run_roots),
         "wheel_travel_m": last_center[0] - first_center[0],
         "wheel_vertical_change_m": last_center[2] - first_center[2],
@@ -217,7 +234,13 @@ def analyze(case_dir: Path) -> dict:
         case_dir, float(manifest["terrain"].get("bulk_density_tolerance_fraction", 0.03))
     )
     if result["density_gate"] and result["density_gate"]["status"].startswith("REJECT"):
-        result["status"] = "REJECT_DENSITY_MISMATCH"
+        if analysis_policy.get("density_gate_affects_status", True):
+            result["status"] = "REJECT_DENSITY_MISMATCH"
+        else:
+            result["warnings"].append(
+                "Density mismatch retained as a warning by the software-checkout policy; "
+                "do not interpret absolute compaction."
+            )
     output = case_dir / "wheel_performance.json"
     output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
     return result

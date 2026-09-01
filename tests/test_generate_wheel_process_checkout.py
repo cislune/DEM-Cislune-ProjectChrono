@@ -21,6 +21,8 @@ def test_build_case_is_bounded_and_nonphysical():
 
     assert case["case_id"] == "process-smooth_control-r12mm-dt10us"
     assert case["model_status"] == "software_process_checkout"
+    assert case["analysis"]["minimum_lane_particles"] == 5
+    assert case["analysis"]["density_gate_affects_status"] is False
     assert case["terrain"]["settle_time_s"] == 0.4
     assert case["terrain"]["compression_max_time_s"] == 1.5
     assert case["test"]["duration_s"] == 0.08

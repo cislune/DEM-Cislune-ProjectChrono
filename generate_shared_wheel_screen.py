@@ -36,7 +36,8 @@ def prepare_manifest(
     radius_label = f"{particle_radius_mm:g}".replace(".", "p")
     seed_suffix = "" if random_seed == 77 else f"-seed{random_seed}"
     process_suffix = ""
-    if case.get("model_status") == "software_process_checkout":
+    source_model_status = case.get("model_status")
+    if source_model_status == "software_process_checkout":
         time_step_us = float(case["terrain"]["time_step_s"]) * 1_000_000.0
         time_step_label = f"{time_step_us:g}".replace(".", "p")
         process_suffix = f"-process-dt{time_step_label}us"
@@ -44,6 +45,7 @@ def prepare_manifest(
         f"wheel-shared-bed-r{radius_label}mm-cpt-informed{process_suffix}{seed_suffix}"
     )
     case["model_status"] = "cpt_informed_shared_bed_preparation"
+    case["source_model_status"] = source_model_status
     case["purpose"] = (
         f"Prepare one reproducible wheel-scale {particle_radius_mm:g} mm bed for the "
         "accelerated comparative screen. "
@@ -89,10 +91,12 @@ def screen_queue(
         if not source.is_absolute():
             source = project_root / source
         case = copy.deepcopy(json.loads(source.read_text()))
+        source_model_status = case.get("model_status")
         case["case_id"] += "-shared-bed"
         if random_seed != 77:
             case["case_id"] += f"-seed{random_seed}"
         case["model_status"] = "cpt_informed_fixed_realization_wheel_screen"
+        case["source_model_status"] = source_model_status
         case["terrain"]["initial_state_csv"] = str(
             runtime_source_state or source_state.resolve()
         )

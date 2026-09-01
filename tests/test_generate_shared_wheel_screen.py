@@ -101,3 +101,4 @@ def test_prepare_manifest_distinguishes_process_timestep(tmp_path):
 
     prepared = json.loads(output.read_text())
     assert prepared["case_id"] == "wheel-shared-bed-r12mm-cpt-informed-process-dt20us"
+    assert prepared["source_model_status"] == "software_process_checkout"

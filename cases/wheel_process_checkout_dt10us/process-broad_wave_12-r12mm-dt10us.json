@@ -1,4 +1,8 @@
 {
+  "analysis": {
+    "density_gate_affects_status": false,
+    "minimum_lane_particles": 5
+  },
   "case_id": "process-broad_wave_12-r12mm-dt10us",
   "model_status": "software_process_checkout",
   "output": {

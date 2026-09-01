@@ -33,6 +33,10 @@ def build_case(candidate: dict, particle_radius_m: float, time_step_s: float) ->
             "contact output, compaction analysis, and ranking. Runtime and integrity are the "
             "acceptance criteria; results are not physically interpreted."
         ),
+        "analysis": {
+            "minimum_lane_particles": 5,
+            "density_gate_affects_status": False,
+        },
         "wheel": {
             "obj": dem["obj"],
             "obj_units": "m",

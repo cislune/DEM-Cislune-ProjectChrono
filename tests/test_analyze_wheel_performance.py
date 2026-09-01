@@ -14,6 +14,14 @@ class AnalyzeWheelPerformanceTests(unittest.TestCase):
         self.assertAlmostEqual(metrics["column_strain_proxy"], 0.1)
         self.assertGreater(metrics["p95_surface_settlement_m"], 0.0)
 
+    def test_lane_threshold_is_explicit_for_coarse_checkout(self):
+        initial = [(0.01 * i, 0.0, 0.01 * i) for i in range(8)]
+        final = [(x, y, z * 0.9) for x, y, z in initial]
+        with self.assertRaisesRegex(ValueError, "found 8, require 10"):
+            analysis.lane_metrics(initial, final, 0.0, 0.1, 0.1)
+        metrics = analysis.lane_metrics(initial, final, 0.0, 0.1, 0.1, 5)
+        self.assertEqual(metrics["particles"], 8)
+
     def test_quantile(self):
         self.assertEqual(analysis.quantile([0.0, 10.0], 0.5), 5.0)
 
