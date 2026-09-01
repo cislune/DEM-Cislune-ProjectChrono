@@ -25,6 +25,11 @@ class AnalyzeWheelPerformanceTests(unittest.TestCase):
     def test_quantile(self):
         self.assertEqual(analysis.quantile([0.0, 10.0], 0.5), 5.0)
 
+    def test_describe_distinguishes_signed_and_absolute_medians(self):
+        metrics = analysis.describe([-3.0, 1.0, 2.0])
+        self.assertEqual(metrics["median"], 1.0)
+        self.assertEqual(metrics["median_abs"], 2.0)
+
     def test_density_gate_rejects_mismatched_imported_bed(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             terrain = Path(temp_dir) / "terrain"

@@ -74,6 +74,7 @@ def describe(values: list[float]) -> dict[str, float | int | None]:
     return {
         "n": len(values),
         "median": statistics.median(values) if values else None,
+        "median_abs": statistics.median(abs(value) for value in values) if values else None,
         "p95_abs": quantile([abs(value) for value in values], 0.95) if values else None,
         "max_abs": max((abs(value) for value in values), default=None),
     }

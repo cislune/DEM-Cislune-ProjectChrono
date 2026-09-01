@@ -20,7 +20,7 @@ def write_case(root, case_id, settlement_mm, strain_percent, torque):
                     "column_strain_proxy": strain_percent / 100.0,
                 },
                 "mobility": {
-                    "torque_y_nm": {"median": torque},
+                    "torque_y_nm": {"median": -torque, "median_abs": torque},
                     "median_abs_drawbar_over_normal_load": 0.1,
                 },
                 "reference_spin_gate": {"status": "PASS_REFERENCE_SPIN"},

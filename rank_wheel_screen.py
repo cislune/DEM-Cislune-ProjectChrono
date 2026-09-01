@@ -30,7 +30,10 @@ def load_rows(output_root: Path) -> list[dict]:
         if not result["status"].startswith("PASS"):
             continue
         manifest = json.loads((path.parent / "frozen_case.json").read_text())
-        torque = result["mobility"]["torque_y_nm"]["median"]
+        torque_summary = result["mobility"]["torque_y_nm"]
+        torque = torque_summary.get("median_abs")
+        if torque is None and torque_summary.get("median") is not None:
+            torque = abs(torque_summary["median"])
         settlement = result["lane"]["p95_surface_settlement_m"]
         strain = result["lane"]["column_strain_proxy"]
         rows.append(
@@ -39,7 +42,7 @@ def load_rows(output_root: Path) -> list[dict]:
                 "wheel": canonical_wheel_name(result["case_id"]),
                 "surface_settlement_mm": settlement * 1000.0,
                 "column_strain_proxy_percent": strain * 100.0,
-                "median_abs_torque_nm": abs(torque) if torque is not None else None,
+                "median_abs_torque_nm": torque,
                 "median_abs_drawbar_over_normal_load": result["mobility"]["median_abs_drawbar_over_normal_load"],
                 "feature_height_particle_radii": manifest["wheel"].get("feature_height_in_particle_radii"),
                 "model_status": result["model_status"],
