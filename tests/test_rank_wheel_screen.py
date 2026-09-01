@@ -49,6 +49,13 @@ def test_canonical_name_handles_seeded_shared_bed_suffix():
     )
 
 
+def test_canonical_name_handles_process_checkout_suffix():
+    assert (
+        canonical_wheel_name("process-broad_wave_12-r12mm-dt10us-shared-bed")
+        == "broad_wave_12"
+    )
+
+
 def test_positive_compaction_beats_dilation(tmp_path):
     write_case(tmp_path, "screen-smooth_control-coarse-cpt-informed", 1.0, 1.0, 1.0)
     write_case(tmp_path, "screen-compactor-coarse-cpt-informed", 3.0, 3.0, 1.1)
@@ -56,3 +63,24 @@ def test_positive_compaction_beats_dilation(tmp_path):
     rows = load_rows(tmp_path)
     assert rows[0]["wheel"] == "compactor"
     assert rows[-1]["wheel"] == "dilator"
+
+
+def test_loads_process_checkout_cases(tmp_path):
+    write_case(
+        tmp_path,
+        "process-smooth_control-r12mm-dt10us-shared-bed",
+        1.0,
+        1.0,
+        1.0,
+    )
+    write_case(
+        tmp_path,
+        "process-broad_wave_12-r12mm-dt10us-shared-bed",
+        2.0,
+        2.0,
+        1.2,
+    )
+
+    rows = load_rows(tmp_path)
+
+    assert [row["wheel"] for row in rows] == ["broad_wave_12", "smooth_control"]

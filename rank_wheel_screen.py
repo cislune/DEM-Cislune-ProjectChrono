@@ -13,15 +13,19 @@ from pathlib import Path
 
 def canonical_wheel_name(case_id: str) -> str:
     name = case_id.removeprefix("screen-")
+    name = name.removeprefix("process-")
     name = re.sub(r"-seed-?\d+$", "", name)
     for suffix in ("-shared-bed", "-cpt-informed", "-coarse"):
         name = name.removesuffix(suffix)
+    name = re.sub(r"-r[^-]+mm-dt[^-]+us$", "", name)
     return name
 
 
 def load_rows(output_root: Path) -> list[dict]:
     rows = []
-    for path in output_root.glob("screen-*/wheel_performance.json"):
+    paths = sorted(output_root.glob("screen-*/wheel_performance.json"))
+    paths.extend(sorted(output_root.glob("process-*/wheel_performance.json")))
+    for path in paths:
         result = json.loads(path.read_text())
         if not result["status"].startswith("PASS"):
             continue
