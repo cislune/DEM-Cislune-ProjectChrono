@@ -56,6 +56,14 @@ class GenerateWheelCandidateTests(unittest.TestCase):
             generator.RTGS_HUB_REFERENCE_OD_M,
         )
 
+    def test_tuned_low_grouser_reduces_feature_height_only(self):
+        specs = {spec.name: spec for spec in generator.CANDIDATES}
+        baseline = specs["low_grouser_16"]
+        tuned = specs["low_grouser_16_10mm"]
+        self.assertEqual(tuned.lobes, baseline.lobes)
+        self.assertEqual(tuned.profile_exponent, baseline.profile_exponent)
+        self.assertAlmostEqual(tuned.feature_height_m, 0.010)
+
 
 if __name__ == "__main__":
     unittest.main()

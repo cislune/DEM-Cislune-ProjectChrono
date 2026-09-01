@@ -43,6 +43,7 @@ def test_generate_writes_bounded_candidate_ladder(tmp_path):
                     candidate("broad_wave_12", 0.198, 0.008),
                     candidate("chevron_wave_14", 0.199, 0.009),
                     candidate("low_grouser_16", 0.202, 0.012),
+                    candidate("low_grouser_16_10mm", 0.200, 0.010),
                     candidate("staggered_wave_12", 0.204, 0.014),
                 ]
             }
@@ -51,13 +52,14 @@ def test_generate_writes_bounded_candidate_ladder(tmp_path):
 
     paths = generate(catalog, tmp_path / "cases" / "checkout", 0.012, 0.00002)
 
-    assert len(paths) == 5
+    assert len(paths) == 6
     queue = json.loads((tmp_path / "cases" / "checkout" / "process_checkout_queue.json").read_text())
     assert queue["sequence"] == [
         "smooth_control",
         "broad_wave_12",
         "chevron_wave_14",
         "low_grouser_16",
+        "low_grouser_16_10mm",
         "staggered_wave_12",
     ]
     assert all("dt20us" in path.name for path in paths)

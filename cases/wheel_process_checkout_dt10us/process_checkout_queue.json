@@ -5,6 +5,7 @@
     "cases/wheel_process_checkout_dt10us/process-broad_wave_12-r12mm-dt10us.json",
     "cases/wheel_process_checkout_dt10us/process-chevron_wave_14-r12mm-dt10us.json",
     "cases/wheel_process_checkout_dt10us/process-low_grouser_16-r12mm-dt10us.json",
+    "cases/wheel_process_checkout_dt10us/process-low_grouser_16_10mm-r12mm-dt10us.json",
     "cases/wheel_process_checkout_dt10us/process-staggered_wave_12-r12mm-dt10us.json"
   ],
   "run_policy": "Generate one shared bed, require a passing smooth-control pipeline, then run the bounded candidate set against that fixed realization. Increase fidelity only after runtime, output-integrity, and mobility gates pass.",
@@ -14,6 +15,7 @@
     "broad_wave_12",
     "chevron_wave_14",
     "low_grouser_16",
+    "low_grouser_16_10mm",
     "staggered_wave_12"
   ]
 }

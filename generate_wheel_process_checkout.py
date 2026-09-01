@@ -13,6 +13,7 @@ CANDIDATE_SEQUENCE = (
     "broad_wave_12",
     "chevron_wave_14",
     "low_grouser_16",
+    "low_grouser_16_10mm",
     "staggered_wave_12",
 )
 

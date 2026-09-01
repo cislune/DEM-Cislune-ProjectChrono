@@ -63,6 +63,16 @@ CANDIDATES = (
         profile_exponent=1.1,
     ),
     WheelSpec(
+        "low_grouser_16_10mm",
+        "Tuned sixteen-feature wheel that reduces the low-grouser height from 12 mm to 10 mm to target the mobility guardrail.",
+        0.190,
+        0.010,
+        0.1016,
+        CANDIDATE_BORE_RADIUS_M,
+        lobes=16,
+        profile_exponent=1.1,
+    ),
+    WheelSpec(
         "staggered_wave_12",
         "Axially staggered broad lobes that avoid engaging the full width at one circumferential station.",
         0.190,
