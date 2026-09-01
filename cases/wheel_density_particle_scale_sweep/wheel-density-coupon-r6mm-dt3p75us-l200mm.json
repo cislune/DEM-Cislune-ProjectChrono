@@ -1,16 +1,21 @@
 {
+  "allowed_stages": [
+    "preflight",
+    "terrain"
+  ],
   "analysis": {
     "density_gate_affects_status": false,
     "minimum_lane_particles": 5
   },
-  "case_id": "wheel-shared-bed-density-scale-r8mm-dt5us",
+  "case_id": "wheel-density-coupon-r6mm-dt3p75us-l200mm",
   "density_particle_scale_sweep": {
-    "base_particle_radius_m": 0.008,
+    "base_particle_radius_m": 0.006,
+    "bin_travel_length_m": 0.2,
     "compression_release_margin": 0.18,
     "random_seed": 77,
     "source_manifest": "cases/wheel_phase_screen_r8mm_dt5us_1p2s/process-smooth_control-r8mm-dt5us-phase1p2s.json",
     "source_manifest_sha256": "05276530a3543723e672fdcf924ad551d8d54e7896a07d5d6334e76f901b6f1b",
-    "time_step_s": 5e-06
+    "time_step_s": 3.7500000000000005e-06
   },
   "model_status": "density_preparation_particle_scale_sweep",
   "output": {
@@ -35,9 +40,9 @@
   },
   "source_model_status": "software_process_checkout",
   "terrain": {
-    "base_particle_radius_m": 0.008,
+    "base_particle_radius_m": 0.006,
     "bed_depth_m": 0.105,
-    "bin_travel_length_m": 0.64,
+    "bin_travel_length_m": 0.2,
     "bin_width_m": 0.2,
     "calibration_status": "CPT-selected material parameters transferred to a deliberately coarse runtime checkout; no absolute prediction permitted",
     "coefficient_of_restitution": 0.3,
@@ -58,7 +63,7 @@
     "settle_time_s": 0.4,
     "target_bulk_density_kg_m3": 1703.2107925580497,
     "target_settled_bed_height_m": 0.075,
-    "time_step_s": 5e-06,
+    "time_step_s": 3.7500000000000005e-06,
     "wheel_cohesion": 0.0,
     "wheel_friction": 0.6,
     "wheel_restitution": 0.2,

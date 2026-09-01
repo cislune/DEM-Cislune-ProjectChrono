@@ -57,6 +57,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--select", help="1-based comma-separated queue entries")
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--continue-on-error", action="store_true")
+    parser.add_argument(
+        "--max-wall-s",
+        type=int,
+        help="per-case wall-time cap passed to the Docker wrapper",
+    )
     return parser.parse_args()
 
 
@@ -68,6 +73,8 @@ def main() -> int:
     }
     if args.stage not in valid_stages[args.kind]:
         raise SystemExit(f"Stage {args.stage!r} is not valid for {args.kind} queues")
+    if args.max_wall_s is not None and args.max_wall_s <= 0:
+        raise SystemExit("--max-wall-s must be positive")
     project_root = Path(__file__).resolve().parent
     queue = json.loads(args.queue.read_text())
     manifests = queue["manifests"]
@@ -76,6 +83,8 @@ def main() -> int:
         "run_cpt_case_docker.sh" if args.kind == "cpt" else "run_dem_case_docker.sh"
     )
     env = os.environ.copy()
+    if args.max_wall_s is not None:
+        env["GRASP_DEM_MAX_WALL_S"] = str(args.max_wall_s)
     outcomes = []
     for index in selection:
         manifest = project_root / manifests[index]

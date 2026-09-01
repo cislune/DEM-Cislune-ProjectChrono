@@ -30,6 +30,20 @@ class DemCaseRunnerTests(unittest.TestCase):
         omega = report["derived"]["angular_speed_rad_s_by_slip"]["0.0939678"]
         self.assertAlmostEqual(omega, 0.580902, places=5)
 
+    def test_terrain_only_coupon_can_be_shorter_than_wheel_travel(self):
+        root = Path(__file__).resolve().parents[1]
+        manifest = (
+            root
+            / "cases"
+            / "wheel_density_particle_scale_sweep"
+            / "wheel-density-coupon-r6mm-dt3p75us-l200mm.json"
+        )
+        with tempfile.TemporaryDirectory() as temp_dir:
+            _, _, report = runner.preflight_case(manifest, root, Path(temp_dir))
+        self.assertEqual(report["status"], "PASS")
+        self.assertTrue(report["derived"]["terrain_only_preparation"])
+        self.assertGreater(report["derived"]["minimum_bin_travel_length_m"], 0.2)
+
     def test_axis_transform_and_centering(self):
         obj = """v 10 -1 -2
 v 10 1 -2

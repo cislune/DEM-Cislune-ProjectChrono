@@ -405,14 +405,16 @@ def preflight_case(
     travel_distance = linear_speed * duration
     required_travel = 2.0 * measured_envelope_radius + travel_distance + 8.0 * particle_radius
     required_width = measured_width + 8.0 * particle_radius
+    allowed_stages = set(case.get("allowed_stages", ()))
+    terrain_only = bool(allowed_stages) and allowed_stages <= {"preflight", "terrain"}
     if particle_radius <= 0:
         failures.append("base_particle_radius_m must be positive")
-    if bin_travel < required_travel:
+    if bin_travel < required_travel and not terrain_only:
         failures.append(
             f"bin travel length {bin_travel:.6g} m is below the {required_travel:.6g} m "
             "minimum for wheel diameter, commanded travel, and particle clearance"
         )
-    if bin_width < required_width:
+    if bin_width < required_width and not terrain_only:
         failures.append(
             f"bin width {bin_width:.6g} m is below the {required_width:.6g} m minimum "
             "for wheel width and particle clearance"
@@ -517,6 +519,7 @@ def preflight_case(
                 )
                 for slip in slips
             },
+            "terrain_only_preparation": terrain_only,
         },
         "physical_reference_path": str(reference_path) if reference_path else None,
         "physical_reference_sha256": reference_sha256,
@@ -857,6 +860,13 @@ def main(argv: list[str] | None = None) -> int:
     output_root = args.output_root.resolve()
     case, paths, report = preflight_case(case_path, project_root, output_root)
     print_preflight(report)
+    allowed_stages = set(case.get("allowed_stages", ()))
+    if allowed_stages and args.stage not in allowed_stages:
+        print(
+            f"ERROR: stage {args.stage!r} is not permitted; allowed stages are "
+            + ", ".join(sorted(allowed_stages))
+        )
+        return 2
     if report["failures"]:
         return 2
     if args.stage == "preflight":

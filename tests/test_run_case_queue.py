@@ -26,6 +26,13 @@ class RunCaseQueueTests(unittest.TestCase):
         ):
             self.assertEqual(queue.parse_args().stage, "terrain")
 
+    def test_wall_time_cap_is_parsed(self):
+        with patch(
+            "sys.argv",
+            ["run_case_queue.py", "queue.json", "--kind", "wheel", "--max-wall-s", "300"],
+        ):
+            self.assertEqual(queue.parse_args().max_wall_s, 300)
+
 
 if __name__ == "__main__":
     unittest.main()

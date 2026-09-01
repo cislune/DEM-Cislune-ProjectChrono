@@ -40,8 +40,10 @@ def test_generate_sweep_scales_timestep_with_radius(tmp_path):
     queue_output = generate_sweep(queue, output, [0.006, 0.004])
     generated = json.loads(queue_output.read_text())
     cases = [json.loads((root / path).read_text()) for path in generated["manifests"]]
-    assert cases[0]["case_id"].endswith("r6mm-dt3p75us")
+    assert cases[0]["case_id"].endswith("r6mm-dt3p75us-l200mm")
     assert cases[0]["terrain"]["time_step_s"] == pytest.approx(0.00000375)
+    assert cases[0]["terrain"]["bin_travel_length_m"] == 0.2
+    assert cases[0]["allowed_stages"] == ["preflight", "terrain"]
     assert cases[1]["terrain"]["base_particle_radius_m"] == 0.004
     assert cases[1]["density_particle_scale_sweep"]["source_manifest"] == (
         "cases/wheel_source/smooth.json"

@@ -26,11 +26,14 @@ def generate_sweep(
     particle_radii_m: list[float],
     release_margin: float = 0.18,
     random_seed: int = 77,
+    bin_travel_length_m: float = 0.2,
 ) -> Path:
     if not particle_radii_m or any(value <= 0 for value in particle_radii_m):
         raise ValueError("Particle radii must be positive")
     if len(set(particle_radii_m)) != len(particle_radii_m):
         raise ValueError("Particle radii must be unique")
+    if bin_travel_length_m <= 0:
+        raise ValueError("Coupon travel length must be positive")
 
     source_path, source_case = find_smooth_manifest(queue_path)
     project_root = queue_path.parents[2].resolve()
@@ -52,10 +55,12 @@ def generate_sweep(
         radius_label = label_mm(radius)
         step_label = label_us(time_step)
         case = copy.deepcopy(source_case)
+        length_label = label_mm(bin_travel_length_m)
         case["case_id"] = (
-            f"wheel-shared-bed-density-scale-r{radius_label}mm-dt{step_label}us"
+            f"wheel-density-coupon-r{radius_label}mm-dt{step_label}us-l{length_label}mm"
         )
         case["model_status"] = "density_preparation_particle_scale_sweep"
+        case["allowed_stages"] = ["preflight", "terrain"]
         case["source_model_status"] = source_case.get("model_status")
         case["purpose"] = (
             "Terrain-only resolution sweep to quantify whether coarse spherical "
@@ -65,6 +70,7 @@ def generate_sweep(
         terrain.pop("initial_state_csv", None)
         terrain["base_particle_radius_m"] = radius
         terrain["time_step_s"] = time_step
+        terrain["bin_travel_length_m"] = bin_travel_length_m
         terrain["compression_release_margin"] = release_margin
         terrain["random_seed"] = random_seed
         case["density_particle_scale_sweep"] = {
@@ -74,6 +80,7 @@ def generate_sweep(
             "time_step_s": time_step,
             "compression_release_margin": release_margin,
             "random_seed": random_seed,
+            "bin_travel_length_m": bin_travel_length_m,
         }
         destination = output_dir / f"{case['case_id']}.json"
         destination.write_text(json.dumps(case, indent=2, sort_keys=True) + "\n")
@@ -88,8 +95,8 @@ def generate_sweep(
                     str(path.relative_to(project_root)) for path in manifests
                 ],
                 "run_policy": (
-                    "Run terrain stage only. Begin with 6 mm; run 4 mm only if the "
-                    "density trend justifies the added particle count."
+                    "These manifests permit terrain stage only. Begin with 6 mm; "
+                    "run 4 mm only if the density trend justifies the added particle count."
                 ),
             },
             indent=2,
@@ -107,6 +114,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--particle-radii-mm", default="8,6,4")
     parser.add_argument("--release-margin", type=float, default=0.18)
     parser.add_argument("--random-seed", type=int, default=77)
+    parser.add_argument("--bin-travel-length-m", type=float, default=0.2)
     return parser.parse_args()
 
 
@@ -123,6 +131,7 @@ def main() -> int:
         radii,
         args.release_margin,
         args.random_seed,
+        args.bin_travel_length_m,
     )
     print(f"Density particle-scale queue: {queue}")
     return 0
