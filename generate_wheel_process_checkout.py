@@ -81,10 +81,13 @@ def build_case(candidate: dict, particle_radius_m: float, time_step_s: float) ->
             "initial_solid_fraction": 0.55,
             "target_settled_bed_height_m": 0.075,
             "target_bulk_density_kg_m3": 1703.2107925580497,
-            "settle_time_s": 0.05,
+            # The target-mass generator can stack the coarse checkout particles
+            # above the nominal fill height. Let gravity collapse that cloud
+            # before sizing the preparation plate travel.
+            "settle_time_s": 0.4,
             "compression_frame_time_s": 0.0005,
             "compression_speed_m_s": 0.1,
-            "compression_max_time_s": 0.5,
+            "compression_max_time_s": 1.5,
             "compression_release_margin": 0.18,
             "post_compression_relax_s": 0.05,
             "random_seed": 77,
