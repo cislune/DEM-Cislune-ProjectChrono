@@ -106,7 +106,9 @@ def build_case(candidate: dict, particle_radius_m: float, time_step_s: float) ->
             "wheel_frame_time_s": 0.001,
             "wheel_progress_every_n_frames": 10,
             "wheel_write_every_n_frames": 10,
-            "write_wheel_terrain_motion": False,
+            # Compaction analysis consumes the wheel-stage terrain snapshots.
+            # The bounded checkout writes only eight small frames.
+            "write_wheel_terrain_motion": True,
             "write_wheel_mesh_motion": True,
             "write_contact_forces": True,
         },

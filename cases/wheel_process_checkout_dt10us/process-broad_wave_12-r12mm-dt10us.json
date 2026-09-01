@@ -11,7 +11,7 @@
     "write_contact_forces": true,
     "write_terrain_settling_motion": false,
     "write_wheel_mesh_motion": true,
-    "write_wheel_terrain_motion": false
+    "write_wheel_terrain_motion": true
   },
   "purpose": "Bounded checkout of terrain preparation, wheel OBJ import, prescribed motion, contact output, compaction analysis, and ranking. Runtime and integrity are the acceptance criteria; results are not physically interpreted.",
   "schema_version": 1,

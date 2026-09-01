@@ -25,6 +25,7 @@ def test_build_case_is_bounded_and_nonphysical():
     assert case["terrain"]["compression_max_time_s"] == 1.5
     assert case["test"]["duration_s"] == 0.08
     assert case["output"]["terrain_progress_every_n_frames"] == 10
+    assert case["output"]["write_wheel_terrain_motion"] is True
     assert "physical_reference" not in case
 
 
