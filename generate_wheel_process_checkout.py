@@ -8,7 +8,13 @@ import json
 from pathlib import Path
 
 
-CANDIDATE_SEQUENCE = ("smooth_control", "broad_wave_12")
+CANDIDATE_SEQUENCE = (
+    "smooth_control",
+    "broad_wave_12",
+    "chevron_wave_14",
+    "low_grouser_16",
+    "staggered_wave_12",
+)
 
 
 def label_micrometers(value_m: float) -> str:
@@ -147,8 +153,8 @@ def generate(
         "sequence": list(CANDIDATE_SEQUENCE),
         "run_policy": (
             "Generate one shared bed, require a passing smooth-control pipeline, then run "
-            "the broad-wave candidate. Increase fidelity only after bounded runtime and "
-            "output-integrity gates pass."
+            "the bounded candidate set against that fixed realization. Increase fidelity only "
+            "after runtime, output-integrity, and mobility gates pass."
         ),
     }
     queue_path = output_dir / "process_checkout_queue.json"

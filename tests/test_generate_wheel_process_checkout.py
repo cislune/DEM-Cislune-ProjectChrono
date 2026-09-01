@@ -31,7 +31,7 @@ def test_build_case_is_bounded_and_nonphysical():
     assert "physical_reference" not in case
 
 
-def test_generate_writes_two_case_ladder(tmp_path):
+def test_generate_writes_bounded_candidate_ladder(tmp_path):
     catalog_dir = tmp_path / "wheel_candidates"
     catalog_dir.mkdir()
     catalog = catalog_dir / "candidate_catalog.json"
@@ -41,6 +41,9 @@ def test_generate_writes_two_case_ladder(tmp_path):
                 "candidates": [
                     candidate("smooth_control", 0.19),
                     candidate("broad_wave_12", 0.198, 0.008),
+                    candidate("chevron_wave_14", 0.199, 0.009),
+                    candidate("low_grouser_16", 0.202, 0.012),
+                    candidate("staggered_wave_12", 0.204, 0.014),
                 ]
             }
         )
@@ -48,7 +51,13 @@ def test_generate_writes_two_case_ladder(tmp_path):
 
     paths = generate(catalog, tmp_path / "cases" / "checkout", 0.012, 0.00002)
 
-    assert len(paths) == 2
+    assert len(paths) == 5
     queue = json.loads((tmp_path / "cases" / "checkout" / "process_checkout_queue.json").read_text())
-    assert queue["sequence"] == ["smooth_control", "broad_wave_12"]
+    assert queue["sequence"] == [
+        "smooth_control",
+        "broad_wave_12",
+        "chevron_wave_14",
+        "low_grouser_16",
+        "staggered_wave_12",
+    ]
     assert all("dt20us" in path.name for path in paths)
