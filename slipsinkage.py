@@ -4,6 +4,7 @@ from DEME import PDSampler
 import numpy as np
 import random
 import os
+import time
 import pandas as pd
 
 
@@ -234,6 +235,7 @@ for trial_num in range(NUM_TRIALS):
         settled_data_dir = os.path.join(out_dir, SLIP_SETTLED_SUBDIR)
 
         write_every = int(getattr(c, "SLIP_WRITE_EVERY_N_FRAMES_st", 100))
+        progress_every = int(getattr(c, "SLIP_PROGRESS_EVERY_N_FRAMES_st", write_every))
         write_terrain = bool(getattr(c, "SLIP_WRITE_TERRAIN_st", True))
         write_wheel = bool(getattr(c, "SLIP_WRITE_WHEEL_st", True))
         write_contact = bool(getattr(c, "SLIP_WRITE_CONTACT_st", True))
@@ -255,6 +257,7 @@ for trial_num in range(NUM_TRIALS):
         frame_time = float(getattr(c, "SLIP_FRAME_TIME_S_st", 1e-3))
         t = 0.0
         frame = 0
+        wheel_wall_start = time.monotonic()
 
         solver.DoDynamicsThenSync(0)
         solver.ChangeFamily(1, 2)
@@ -262,9 +265,15 @@ for trial_num in range(NUM_TRIALS):
 
         while t < c.TRIAL_RUN_TIME_SLIP_SINKAGE_st:
 
-            if frame % write_every == 0:
-                print(f"Frame: {frame}, Trial: {trial_num + 1}, Slip: {slip_value}")
+            if frame % progress_every == 0:
+                print(
+                    f"Wheel frame: {frame}, simulated: {t:.6g} s, "
+                    f"wall: {time.monotonic() - wheel_wall_start:.1f} s, "
+                    f"trial: {trial_num + 1}, slip: {slip_value}",
+                    flush=True,
+                )
 
+            if frame % write_every == 0:
                 if write_terrain:
                     solver.WriteSphereFile(
                         os.path.join(

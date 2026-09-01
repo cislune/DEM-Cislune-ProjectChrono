@@ -35,8 +35,13 @@ def prepare_manifest(
     particle_radius_mm = float(case["terrain"]["base_particle_radius_m"]) * 1000.0
     radius_label = f"{particle_radius_mm:g}".replace(".", "p")
     seed_suffix = "" if random_seed == 77 else f"-seed{random_seed}"
+    process_suffix = ""
+    if case.get("model_status") == "software_process_checkout":
+        time_step_us = float(case["terrain"]["time_step_s"]) * 1_000_000.0
+        time_step_label = f"{time_step_us:g}".replace(".", "p")
+        process_suffix = f"-process-dt{time_step_label}us"
     case["case_id"] = (
-        f"wheel-shared-bed-r{radius_label}mm-cpt-informed{seed_suffix}"
+        f"wheel-shared-bed-r{radius_label}mm-cpt-informed{process_suffix}{seed_suffix}"
     )
     case["model_status"] = "cpt_informed_shared_bed_preparation"
     case["purpose"] = (

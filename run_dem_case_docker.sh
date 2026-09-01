@@ -48,6 +48,9 @@ done
 case_id=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["case_id"])' "$ROOT/$manifest_rel")
 timestamp=$(date -u +%Y%m%dT%H%M%SZ)
 log_path="$OUTPUT_ROOT/_logs/${timestamp}_${case_id}_${stage}.log"
+started_epoch=$(date +%s)
+started_iso=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+printf 'run_started_utc=%s\n' "$started_iso" | tee "$log_path"
 
 set +e
 docker run --rm --gpus all \
@@ -59,11 +62,14 @@ docker run --rm --gpus all \
     -w /workspace \
     "$IMAGE" \
     "$PYTHON_IN_CONTAINER" -u /workspace/dem_case_runner.py "/workspace/$manifest_rel" \
-    --output-root /outputs "$@" 2>&1 | tee "$log_path"
+    --output-root /outputs "$@" 2>&1 | tee -a "$log_path"
 status=${PIPESTATUS[0]}
 set -e
 
-printf '\ncontainer_exit_status=%s\n' "$status" >> "$log_path"
+finished_epoch=$(date +%s)
+finished_iso=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+printf '\ncontainer_exit_status=%s\nrun_finished_utc=%s\nwall_duration_s=%s\n' \
+    "$status" "$finished_iso" "$((finished_epoch - started_epoch))" >> "$log_path"
 
 docker run --rm -v "$OUTPUT_ROOT:/outputs" "$IMAGE" \
     chown -R "$(id -u):$(id -g)" /outputs

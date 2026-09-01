@@ -6,6 +6,7 @@ import numpy as np
 import random
 import os
 import json
+import time
 
 # ----------------------------------------------------------------------------------------------------------------------------
 # PREPROCESSING (prepare output directories, select terrain particle scale, initialize setup)
@@ -186,22 +187,28 @@ solver.Initialize()
 settle_time = float(getattr(c, "TERRAIN_SETTLE_TIME_S_st", 1.0))
 frame_time = float(getattr(c, "TERRAIN_FRAME_TIME_S_st", 1e-3))
 write_every = int(getattr(c, "TERRAIN_WRITE_EVERY_N_FRAMES_st", 100))
+progress_every = int(getattr(c, "TERRAIN_PROGRESS_EVERY_N_FRAMES_st", write_every))
 write_motion = bool(getattr(c, "TERRAIN_WRITE_MOTION_st", False))
 
 t = 0.0
 frame = 0
+settle_wall_start = time.monotonic()
 
 while t < settle_time:
-    if frame % write_every == 0:
-        print(f"Frame: {frame}")
+    if frame % progress_every == 0:
+        print(
+            f"Terrain frame: {frame}, simulated: {t:.6g} s, "
+            f"wall: {time.monotonic() - settle_wall_start:.1f} s",
+            flush=True,
+        )
 
-        if write_motion:
-            solver.WriteSphereFile(
-                os.path.join(
-                    motion_dir,
-                    f"{c.SPHERE_TERRAIN_GENERATION_MOTION_FILE_NAME}_{frame:04d}.csv"
-                )
+    if write_motion and frame % write_every == 0:
+        solver.WriteSphereFile(
+            os.path.join(
+                motion_dir,
+                f"{c.SPHERE_TERRAIN_GENERATION_MOTION_FILE_NAME}_{frame:04d}.csv"
             )
+        )
         # fixed: use _0000 naming convention for consistency with the rest of the project
 
     solver.DoDynamics(frame_time)
@@ -263,6 +270,8 @@ if target_bulk_density is not None:
     solver.DoDynamicsThenSync(0)
     bulk_density = terrain_mass / (area * (terrain_surface - bin_floor_z_loc))
     compression_time = 0.0
+    compression_steps = 0
+    compression_wall_start = time.monotonic()
     target_compressor_z = bin_floor_z_loc + terrain_mass / (
         area * target_bulk_density * (1.0 + release_margin)
     )
@@ -271,9 +280,15 @@ if target_bulk_density is not None:
         compressor_tracker.SetPos([0, 0, compressor_z])
         solver.DoDynamicsThenSync(frame_time)
         compression_time += frame_time
+        compression_steps += 1
         bulk_density = terrain_mass / (area * (compressor_z - bin_floor_z_loc))
-        if int(compression_time / frame_time) % 100 == 0:
-            print(f"compression density: {bulk_density:.6g} kg/m3")
+        if compression_steps % progress_every == 0:
+            print(
+                f"Compression step: {compression_steps}, simulated: {compression_time:.6g} s, "
+                f"wall: {time.monotonic() - compression_wall_start:.1f} s, "
+                f"density: {bulk_density:.6g} kg/m3",
+                flush=True,
+            )
         if compression_time >= max_time:
             raise RuntimeError(
                 f"Terrain compression did not reach {target_bulk_density:g} kg/m3 within {max_time:g} s"
@@ -283,14 +298,20 @@ if target_bulk_density is not None:
     # compression speed so stored elastic energy is released under control.
     release_time = 0.0
     release_steps = 0
+    release_wall_start = time.monotonic()
     while compressor_z < compressor_release_z:
         compressor_z = min(compressor_release_z, compressor_z + release_speed * frame_time)
         compressor_tracker.SetPos([0, 0, compressor_z])
         solver.DoDynamicsThenSync(frame_time)
         release_time += frame_time
         release_steps += 1
-        if release_steps % 100 == 0:
-            print(f"controlled-release plate z: {compressor_z:.6g} m")
+        if release_steps % progress_every == 0:
+            print(
+                f"Release step: {release_steps}, simulated: {release_time:.6g} s, "
+                f"wall: {time.monotonic() - release_wall_start:.1f} s, "
+                f"plate z: {compressor_z:.6g} m",
+                flush=True,
+            )
 
     solver.DoDynamicsThenSync(0)
     solver.DisableContactBetweenFamilies(0, 10)

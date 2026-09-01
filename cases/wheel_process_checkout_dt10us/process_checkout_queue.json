@@ -1,0 +1,13 @@
+{
+  "catalog": "wheel_candidates/candidate_catalog.json",
+  "manifests": [
+    "cases/wheel_process_checkout_dt10us/process-smooth_control-r12mm-dt10us.json",
+    "cases/wheel_process_checkout_dt10us/process-broad_wave_12-r12mm-dt10us.json"
+  ],
+  "run_policy": "Generate one shared bed, require a passing smooth-control pipeline, then run the broad-wave candidate. Increase fidelity only after bounded runtime and output-integrity gates pass.",
+  "schema_version": 1,
+  "sequence": [
+    "smooth_control",
+    "broad_wave_12"
+  ]
+}

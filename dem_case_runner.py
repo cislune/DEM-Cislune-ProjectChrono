@@ -458,9 +458,24 @@ def preflight_case(
 
     output = case.get("output", {})
     write_every = int(output.get("wheel_write_every_n_frames", 100))
+    wheel_progress_every = int(
+        output.get("wheel_progress_every_n_frames", write_every)
+    )
+    terrain_write_every = int(output.get("terrain_write_every_n_frames", 100))
+    terrain_progress_every = int(
+        output.get("terrain_progress_every_n_frames", terrain_write_every)
+    )
     frame_time = float(output.get("wheel_frame_time_s", 1e-3))
-    if write_every < 1 or frame_time <= 0:
-        failures.append("output frame time and write cadence must be positive")
+    terrain_frame_time = float(output.get("terrain_frame_time_s", 1e-3))
+    if (
+        write_every < 1
+        or wheel_progress_every < 1
+        or terrain_write_every < 1
+        or terrain_progress_every < 1
+        or frame_time <= 0
+        or terrain_frame_time <= 0
+    ):
+        failures.append("output frame times, write cadences, and progress cadences must be positive")
 
     reference_path = None
     reference_sha256 = None
@@ -635,12 +650,24 @@ def apply_case_config(config: Any, case: dict[str, Any], paths: dict[str, Path])
     config.TERRAIN_WRITE_EVERY_N_FRAMES_st = int(
         output.get("terrain_write_every_n_frames", 100)
     )
+    config.TERRAIN_PROGRESS_EVERY_N_FRAMES_st = int(
+        output.get(
+            "terrain_progress_every_n_frames",
+            config.TERRAIN_WRITE_EVERY_N_FRAMES_st,
+        )
+    )
     config.TERRAIN_WRITE_MOTION_st = bool(output.get("write_terrain_settling_motion", False))
     config.TERRAIN_INITIAL_STATE_CSV_st = case.get("_resolved_initial_state_csv")
     config.TERRAIN_IMPORTED_PREPARATION_st = case.get("shared_sample_preparation")
     config.SLIP_FRAME_TIME_S_st = float(output.get("wheel_frame_time_s", 1e-3))
     config.SLIP_WRITE_EVERY_N_FRAMES_st = int(
         output.get("wheel_write_every_n_frames", 100)
+    )
+    config.SLIP_PROGRESS_EVERY_N_FRAMES_st = int(
+        output.get(
+            "wheel_progress_every_n_frames",
+            config.SLIP_WRITE_EVERY_N_FRAMES_st,
+        )
     )
     config.SLIP_WRITE_TERRAIN_st = bool(output.get("write_wheel_terrain_motion", True))
     config.SLIP_WRITE_WHEEL_st = bool(output.get("write_wheel_mesh_motion", True))

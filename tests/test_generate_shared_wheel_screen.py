@@ -72,3 +72,32 @@ def test_screen_queue_distinguishes_nondefault_seed(tmp_path):
     )
     assert generated_case["case_id"].endswith("-shared-bed-seed78")
     assert generated_case["shared_sample_preparation"]["random_seed"] == 78
+
+
+def test_prepare_manifest_distinguishes_process_timestep(tmp_path):
+    root = tmp_path / "project"
+    queue_dir = root / "cases" / "wheel_process_checkout"
+    queue_dir.mkdir(parents=True)
+    case_path = queue_dir / "smooth.json"
+    case_path.write_text(
+        json.dumps(
+            {
+                "case_id": "process-smooth_control-r12mm-dt20us",
+                "model_status": "software_process_checkout",
+                "terrain": {
+                    "base_particle_radius_m": 0.012,
+                    "time_step_s": 0.00002,
+                },
+            }
+        )
+    )
+    queue_path = queue_dir / "queue.json"
+    queue_path.write_text(
+        json.dumps({"manifests": ["cases/wheel_process_checkout/smooth.json"]})
+    )
+
+    output = root / "cases" / "runtime" / "bed.json"
+    prepare_manifest(queue_path, output, 0.18)
+
+    prepared = json.loads(output.read_text())
+    assert prepared["case_id"] == "wheel-shared-bed-r12mm-cpt-informed-process-dt20us"
