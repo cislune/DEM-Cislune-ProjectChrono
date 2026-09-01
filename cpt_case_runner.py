@@ -222,6 +222,7 @@ def apply_config(config: Any, case: dict[str, Any], paths: dict[str, Path]) -> N
     config.LENGTH_st = float(terrain["bin_y_m"])
     config.DEPTH_st = float(terrain["bed_depth_m"])
     config.FULL_HEIGHT_st = -config.DEPTH_st / 2.0 + float(terrain["initial_fill_height_m"])
+    config.TERRAIN_RANDOM_SEED_st = int(terrain.get("random_seed", 77))
     config.TERRAIN_SETTLE_TIME_S_st = float(terrain.get("settle_time_s", 0.5))
     target_density = terrain.get("target_bulk_density_kg_m3")
     target_height = terrain.get("target_settled_bed_height_m")

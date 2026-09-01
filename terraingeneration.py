@@ -21,7 +21,7 @@ settled_dir = os.path.join(c.SPHERE_TERRAIN_GEN_OUT_DIR, "settled terrain data")
 os.makedirs(motion_dir, exist_ok=True)
 os.makedirs(settled_dir, exist_ok=True)
 
-SEED = 77
+SEED = int(getattr(c, "TERRAIN_RANDOM_SEED_st", 77))
 # random seed for reproducible terrain generation
 
 if c.USE_DEMO_WHEEL_st:

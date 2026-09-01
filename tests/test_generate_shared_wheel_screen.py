@@ -21,7 +21,9 @@ def test_prepare_manifest_uses_smooth_case_and_release_margin(tmp_path):
         json.dumps({"manifests": ["cases/wheel_screen_cpt/smooth.json"]})
     )
     output = root / "cases" / "wheel_screen_shared" / "bed.json"
-    prepare_manifest(queue_path, output, 0.2)
+    prepare_manifest(queue_path, output, 0.2, 78)
     prepared = json.loads(output.read_text())
     assert prepared["case_id"] == "wheel-shared-bed-r4mm-cpt-informed"
     assert prepared["terrain"]["compression_release_margin"] == 0.2
+    assert prepared["terrain"]["random_seed"] == 78
+    assert prepared["shared_bed_generation"]["random_seed"] == 78

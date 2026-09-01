@@ -24,7 +24,12 @@ def find_smooth_manifest(queue_path: Path) -> tuple[Path, dict]:
     raise ValueError("CPT-informed queue does not contain a smooth-control case")
 
 
-def prepare_manifest(queue_path: Path, output_path: Path, release_margin: float) -> Path:
+def prepare_manifest(
+    queue_path: Path,
+    output_path: Path,
+    release_margin: float,
+    random_seed: int = 77,
+) -> Path:
     source_path, case = find_smooth_manifest(queue_path)
     case = copy.deepcopy(case)
     case["case_id"] = "wheel-shared-bed-r4mm-cpt-informed"
@@ -35,10 +40,12 @@ def prepare_manifest(queue_path: Path, output_path: Path, release_margin: float)
     )
     case["terrain"].pop("initial_state_csv", None)
     case["terrain"]["compression_release_margin"] = release_margin
+    case["terrain"]["random_seed"] = random_seed
     case["shared_bed_generation"] = {
         "source_manifest": str(source_path.resolve()),
         "source_manifest_sha256": sha256_file(source_path),
         "release_margin": release_margin,
+        "random_seed": random_seed,
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(case, indent=2, sort_keys=True) + "\n")
@@ -120,6 +127,7 @@ def parse_args() -> argparse.Namespace:
         default=Path("cases/wheel_screen_shared/wheel-shared-bed-r4mm-cpt-informed.json"),
     )
     parser.add_argument("--release-margin", type=float, default=0.18)
+    parser.add_argument("--random-seed", type=int, default=77)
     parser.add_argument("--source-state", type=Path)
     parser.add_argument("--runtime-source-state", type=Path)
     parser.add_argument(
@@ -131,7 +139,10 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     prepared = prepare_manifest(
-        args.queue.resolve(), args.shared_bed_manifest.resolve(), args.release_margin
+        args.queue.resolve(),
+        args.shared_bed_manifest.resolve(),
+        args.release_margin,
+        args.random_seed,
     )
     print(f"Shared wheel-bed manifest: {prepared}")
     if args.source_state:
