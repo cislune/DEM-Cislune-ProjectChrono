@@ -56,6 +56,15 @@ def test_canonical_name_handles_process_checkout_suffix():
     )
 
 
+def test_canonical_name_handles_phase_coverage_suffix():
+    assert (
+        canonical_wheel_name(
+            "process-chevron_wave_14-r8mm-dt5us-phase1p2s-shared-bed"
+        )
+        == "chevron_wave_14"
+    )
+
+
 def test_positive_compaction_beats_dilation(tmp_path):
     write_case(tmp_path, "screen-smooth_control-coarse-cpt-informed", 1.0, 1.0, 1.0)
     write_case(tmp_path, "screen-compactor-coarse-cpt-informed", 3.0, 3.0, 1.1)

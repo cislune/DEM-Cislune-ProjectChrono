@@ -17,7 +17,7 @@ def canonical_wheel_name(case_id: str) -> str:
     name = re.sub(r"-seed-?\d+$", "", name)
     for suffix in ("-shared-bed", "-cpt-informed", "-coarse"):
         name = name.removesuffix(suffix)
-    name = re.sub(r"-r[^-]+mm-dt[^-]+us$", "", name)
+    name = re.sub(r"-r[^-]+mm-dt[^-]+us(?:-[A-Za-z0-9_.]+)?$", "", name)
     return name
 
 
