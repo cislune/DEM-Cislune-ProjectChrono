@@ -107,13 +107,6 @@ def build_case(candidate: dict, particle_radius_m: float, time_step_s: float) ->
             "write_wheel_mesh_motion": True,
             "write_contact_forces": True,
         },
-        "physical_reference": {
-            "reference_json": "physical_references/alabama_rider_2026-08-04.json",
-            "comparison_condition": (
-                "Kinematics and load follow the UCF RIDER Alabama reference, but this "
-                "coarse checkout is not compared quantitatively with physical data"
-            ),
-        },
     }
 
 

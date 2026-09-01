@@ -13,10 +13,6 @@
     "write_wheel_mesh_motion": true,
     "write_wheel_terrain_motion": false
   },
-  "physical_reference": {
-    "comparison_condition": "Kinematics and load follow the UCF RIDER Alabama reference, but this coarse checkout is not compared quantitatively with physical data",
-    "reference_json": "physical_references/alabama_rider_2026-08-04.json"
-  },
   "purpose": "Bounded checkout of terrain preparation, wheel OBJ import, prescribed motion, contact output, compaction analysis, and ranking. Runtime and integrity are the acceptance criteria; results are not physically interpreted.",
   "schema_version": 1,
   "solver": {

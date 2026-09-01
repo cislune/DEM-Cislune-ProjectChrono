@@ -24,6 +24,7 @@ def test_build_case_is_bounded_and_nonphysical():
     assert case["terrain"]["settle_time_s"] == 0.05
     assert case["test"]["duration_s"] == 0.08
     assert case["output"]["terrain_progress_every_n_frames"] == 10
+    assert "physical_reference" not in case
 
 
 def test_generate_writes_two_case_ladder(tmp_path):
