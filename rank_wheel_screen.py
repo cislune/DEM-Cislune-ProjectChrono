@@ -7,11 +7,13 @@ import argparse
 import csv
 import json
 import math
+import re
 from pathlib import Path
 
 
 def canonical_wheel_name(case_id: str) -> str:
     name = case_id.removeprefix("screen-")
+    name = re.sub(r"-seed-?\d+$", "", name)
     for suffix in ("-shared-bed", "-cpt-informed", "-coarse"):
         name = name.removesuffix(suffix)
     return name
