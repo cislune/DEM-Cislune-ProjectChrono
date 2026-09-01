@@ -71,6 +71,8 @@ def test_positive_compaction_beats_dilation(tmp_path):
     write_case(tmp_path, "screen-dilator-coarse-cpt-informed", -2.0, -2.0, 0.8)
     rows = load_rows(tmp_path)
     assert rows[0]["wheel"] == "compactor"
+    assert rows[0]["settlement_ratio_to_smooth"] == 3.0
+    assert rows[0]["strain_ratio_to_smooth"] == 3.0
     assert rows[-1]["wheel"] == "dilator"
 
 

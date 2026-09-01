@@ -55,6 +55,11 @@ def load_rows(output_root: Path) -> list[dict]:
     smooth = next((row for row in rows if row["wheel"] == "smooth_control"), None)
     if smooth:
         torque_reference = max(smooth["median_abs_torque_nm"] or 0.0, 1e-9)
+        drawbar_reference = max(
+            smooth["median_abs_drawbar_over_normal_load"] or 0.0, 1e-9
+        )
+        settlement_reference = max(abs(smooth["surface_settlement_mm"]), 1e-9)
+        strain_reference = max(abs(smooth["column_strain_proxy_percent"]), 1e-9)
         settlement_scale = max(
             max(abs(row["surface_settlement_mm"]) for row in rows), 0.1
         )
@@ -64,6 +69,15 @@ def load_rows(output_root: Path) -> list[dict]:
         for row in rows:
             torque_ratio = (row["median_abs_torque_nm"] or 0.0) / torque_reference
             row["torque_ratio_to_smooth"] = torque_ratio
+            row["drawbar_ratio_to_smooth"] = (
+                row["median_abs_drawbar_over_normal_load"] / drawbar_reference
+            )
+            row["settlement_ratio_to_smooth"] = (
+                row["surface_settlement_mm"] / settlement_reference
+            )
+            row["strain_ratio_to_smooth"] = (
+                row["column_strain_proxy_percent"] / strain_reference
+            )
             spin_pass = row["reference_spin_status"] == "PASS_REFERENCE_SPIN"
             row["mobility_guardrail_pass"] = torque_ratio <= 1.35 and spin_pass
             signed_compaction_index = (
