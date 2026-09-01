@@ -197,6 +197,9 @@ def analyze(case_dir: Path) -> dict:
     torque_values = [float(item["torque_y_nm"]) for item in active]
     drawbar_values = [float(item["force_x_n"]) for item in active]
     vertical_values = [float(item["force_z_n"]) for item in active]
+    reference_spin_gate = verify_reference_spin(
+        sorted((run_roots[0] / "wheel motion").glob("*.vtk")), manifest
+    )
     result = {
         "schema_version": 1,
         "case_id": case_id,
@@ -221,9 +224,7 @@ def analyze(case_dir: Path) -> dict:
                 else None
             ),
         },
-        "reference_spin_gate": verify_reference_spin(
-            sorted((run_roots[0] / "wheel motion").glob("*.vtk")), manifest
-        ),
+        "reference_spin_gate": reference_spin_gate,
         "interpretation": (
             "These metrics compare identically configured shapes. The lane strain proxy includes "
             "particle rearrangement and lateral flow; absolute compaction requires CPT calibration "
@@ -241,6 +242,8 @@ def analyze(case_dir: Path) -> dict:
                 "Density mismatch retained as a warning by the software-checkout policy; "
                 "do not interpret absolute compaction."
             )
+    if reference_spin_gate["status"].startswith("REJECT"):
+        result["status"] = "REJECT_REFERENCE_SPIN"
     output = case_dir / "wheel_performance.json"
     output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
     return result

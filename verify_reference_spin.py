@@ -47,9 +47,10 @@ def infer_rigid_motion(before: np.ndarray, after: np.ndarray) -> tuple[np.ndarra
     if np.linalg.det(rotation) < 0:
         vt[-1, :] *= -1
         rotation = vt.T @ u.T
-    translation = after_center - rotation @ before_center
-    residual = float(np.sqrt(np.mean(np.sum(((rotation @ before.T).T + translation - after) ** 2, axis=1))))
-    return rotation, translation, residual
+    center_displacement = after_center - before_center
+    fitted = (rotation @ (before - before_center).T).T + after_center
+    residual = float(np.sqrt(np.mean(np.sum((fitted - after) ** 2, axis=1))))
+    return rotation, center_displacement, residual
 
 
 def frame_number(path: Path) -> int:
@@ -65,12 +66,12 @@ def verify(frame_paths: list[Path], manifest: dict) -> dict:
     elapsed = frame_delta * frame_time
     if elapsed <= 0:
         raise ValueError("Wheel frame timestamps are not increasing")
-    rotation, translation, residual = infer_rigid_motion(
+    rotation, center_displacement, residual = infer_rigid_motion(
         read_vtk_points(first), read_vtk_points(second)
     )
     angle_y = math.atan2(float(rotation[0, 2]), float(rotation[0, 0]))
     omega_y = angle_y / elapsed
-    velocity_x = float(translation[0]) / elapsed
+    velocity_x = float(center_displacement[0]) / elapsed
     rolling_radius = float(manifest["wheel"]["rolling_radius_m"])
     commanded_slip = float(manifest["test"]["slip_ratios"][0])
     expected_omega = float(manifest["test"]["linear_speed_m_s"]) / (
@@ -93,7 +94,7 @@ def verify(frame_paths: list[Path], manifest: dict) -> dict:
         "first_frame": str(first),
         "second_frame": str(second),
         "elapsed_s": elapsed,
-        "translation_x_m": float(translation[0]),
+        "translation_x_m": float(center_displacement[0]),
         "linear_velocity_x_m_s": velocity_x,
         "rotation_about_y_rad": angle_y,
         "angular_velocity_y_rad_s": omega_y,
