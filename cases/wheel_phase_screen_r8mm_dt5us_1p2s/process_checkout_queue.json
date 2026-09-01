@@ -1,0 +1,21 @@
+{
+  "catalog": "wheel_candidates/candidate_catalog.json",
+  "manifests": [
+    "cases/wheel_phase_screen_r8mm_dt5us_1p2s/process-smooth_control-r8mm-dt5us-phase1p2s.json",
+    "cases/wheel_phase_screen_r8mm_dt5us_1p2s/process-broad_wave_12-r8mm-dt5us-phase1p2s.json",
+    "cases/wheel_phase_screen_r8mm_dt5us_1p2s/process-chevron_wave_14-r8mm-dt5us-phase1p2s.json",
+    "cases/wheel_phase_screen_r8mm_dt5us_1p2s/process-low_grouser_16-r8mm-dt5us-phase1p2s.json",
+    "cases/wheel_phase_screen_r8mm_dt5us_1p2s/process-low_grouser_16_10mm-r8mm-dt5us-phase1p2s.json",
+    "cases/wheel_phase_screen_r8mm_dt5us_1p2s/process-staggered_wave_12-r8mm-dt5us-phase1p2s.json"
+  ],
+  "run_policy": "Generate one shared bed, require a passing smooth-control pipeline, then run the bounded candidate set against that fixed realization. Increase fidelity only after runtime, output-integrity, and mobility gates pass.",
+  "schema_version": 1,
+  "sequence": [
+    "smooth_control",
+    "broad_wave_12",
+    "chevron_wave_14",
+    "low_grouser_16",
+    "low_grouser_16_10mm",
+    "staggered_wave_12"
+  ]
+}

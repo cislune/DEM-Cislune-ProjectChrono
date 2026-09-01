@@ -26,14 +26,25 @@ def label_millimeters(value_m: float) -> str:
     return f"{value_m * 1000:g}".replace(".", "p")
 
 
-def build_case(candidate: dict, particle_radius_m: float, time_step_s: float) -> dict:
+def build_case(
+    candidate: dict,
+    particle_radius_m: float,
+    time_step_s: float,
+    duration_s: float = 0.08,
+    wheel_write_every_n_frames: int = 10,
+    case_suffix: str | None = None,
+    bin_travel_length_m: float = 0.52,
+) -> dict:
     dem = candidate["dem"]
     feature_height = float(candidate["design"]["feature_height_m"])
     radius_label = label_millimeters(particle_radius_m)
     step_label = label_micrometers(time_step_s)
+    case_id = f"process-{candidate['name']}-r{radius_label}mm-dt{step_label}us"
+    if case_suffix:
+        case_id += f"-{case_suffix}"
     return {
         "schema_version": 1,
-        "case_id": f"process-{candidate['name']}-r{radius_label}mm-dt{step_label}us",
+        "case_id": case_id,
         "model_status": "software_process_checkout",
         "purpose": (
             "Bounded checkout of terrain preparation, wheel OBJ import, prescribed motion, "
@@ -64,7 +75,7 @@ def build_case(candidate: dict, particle_radius_m: float, time_step_s: float) ->
             "linear_speed_m_s": 0.1,
             "kinematics_mode": "fixed_linear_speed",
             "slip_ratios": [0.09396784087753285],
-            "duration_s": 0.08,
+            "duration_s": duration_s,
             "passes": 1,
         },
         "terrain": {
@@ -85,7 +96,7 @@ def build_case(candidate: dict, particle_radius_m: float, time_step_s: float) ->
             "wheel_restitution": 0.2,
             "wheel_cohesion": 0.0,
             "time_step_s": time_step_s,
-            "bin_travel_length_m": 0.52,
+            "bin_travel_length_m": bin_travel_length_m,
             "bin_width_m": 0.20,
             "bed_depth_m": 0.105,
             "initial_fill_height_m": 0.085,
@@ -115,8 +126,8 @@ def build_case(candidate: dict, particle_radius_m: float, time_step_s: float) ->
             "terrain_write_every_n_frames": 100,
             "write_terrain_settling_motion": False,
             "wheel_frame_time_s": 0.001,
-            "wheel_progress_every_n_frames": 10,
-            "wheel_write_every_n_frames": 10,
+            "wheel_progress_every_n_frames": wheel_write_every_n_frames,
+            "wheel_write_every_n_frames": wheel_write_every_n_frames,
             # Compaction analysis consumes the wheel-stage terrain snapshots.
             # The bounded checkout writes only eight small frames.
             "write_wheel_terrain_motion": True,
@@ -131,6 +142,10 @@ def generate(
     output_dir: Path,
     particle_radius_m: float,
     time_step_s: float,
+    duration_s: float = 0.08,
+    wheel_write_every_n_frames: int = 10,
+    case_suffix: str | None = None,
+    bin_travel_length_m: float = 0.52,
 ) -> list[Path]:
     catalog = json.loads(catalog_path.read_text())
     candidates = {item["name"]: item for item in catalog["candidates"]}
@@ -142,7 +157,15 @@ def generate(
     output_dir.mkdir(parents=True, exist_ok=True)
     paths = []
     for name in CANDIDATE_SEQUENCE:
-        case = build_case(candidates[name], particle_radius_m, time_step_s)
+        case = build_case(
+            candidates[name],
+            particle_radius_m,
+            time_step_s,
+            duration_s,
+            wheel_write_every_n_frames,
+            case_suffix,
+            bin_travel_length_m,
+        )
         path = output_dir / f"{case['case_id']}.json"
         path.write_text(json.dumps(case, indent=2, sort_keys=True) + "\n")
         paths.append(path)
@@ -173,6 +196,10 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--particle-radius-m", type=float, default=0.012)
     parser.add_argument("--time-step-s", type=float, default=0.00001)
+    parser.add_argument("--duration-s", type=float, default=0.08)
+    parser.add_argument("--wheel-write-every-n-frames", type=int, default=10)
+    parser.add_argument("--case-suffix")
+    parser.add_argument("--bin-travel-length-m", type=float, default=0.52)
     return parser.parse_args()
 
 
@@ -183,6 +210,10 @@ def main() -> int:
         args.output_dir.resolve(),
         args.particle_radius_m,
         args.time_step_s,
+        args.duration_s,
+        args.wheel_write_every_n_frames,
+        args.case_suffix,
+        args.bin_travel_length_m,
     )
     for path in paths:
         print(path)

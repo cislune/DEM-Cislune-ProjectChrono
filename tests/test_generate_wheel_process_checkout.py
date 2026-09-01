@@ -31,6 +31,24 @@ def test_build_case_is_bounded_and_nonphysical():
     assert "physical_reference" not in case
 
 
+def test_build_case_supports_phase_coverage_profile():
+    case = build_case(
+        candidate("low_grouser_16", 0.202, 0.012),
+        0.008,
+        0.000005,
+        duration_s=1.2,
+        wheel_write_every_n_frames=50,
+        case_suffix="phase1p2s",
+        bin_travel_length_m=0.64,
+    )
+
+    assert case["case_id"].endswith("-phase1p2s")
+    assert case["test"]["duration_s"] == 1.2
+    assert case["output"]["wheel_write_every_n_frames"] == 50
+    assert case["output"]["wheel_progress_every_n_frames"] == 50
+    assert case["terrain"]["bin_travel_length_m"] == 0.64
+
+
 def test_generate_writes_bounded_candidate_ladder(tmp_path):
     catalog_dir = tmp_path / "wheel_candidates"
     catalog_dir.mkdir()
