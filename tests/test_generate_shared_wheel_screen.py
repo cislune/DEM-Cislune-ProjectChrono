@@ -30,6 +30,9 @@ def test_prepare_manifest_uses_smooth_case_and_release_margin(tmp_path):
     assert prepared["terrain"]["compression_release_margin"] == 0.2
     assert prepared["terrain"]["random_seed"] == 78
     assert prepared["shared_bed_generation"]["random_seed"] == 78
+    assert prepared["shared_bed_generation"]["source_manifest"] == (
+        "cases/wheel_screen_cpt/smooth.json"
+    )
 
 
 def test_screen_queue_distinguishes_nondefault_seed(tmp_path):

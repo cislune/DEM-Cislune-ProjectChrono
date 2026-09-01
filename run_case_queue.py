@@ -41,6 +41,19 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("queue", type=Path)
     parser.add_argument("--kind", choices=("cpt", "wheel"), required=True)
+    parser.add_argument(
+        "--stage",
+        choices=(
+            "preflight",
+            "terrain",
+            "penetration",
+            "analyze",
+            "wheel",
+            "compaction",
+            "all",
+        ),
+        default="all",
+    )
     parser.add_argument("--select", help="1-based comma-separated queue entries")
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--continue-on-error", action="store_true")
@@ -49,6 +62,12 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    valid_stages = {
+        "cpt": {"preflight", "terrain", "penetration", "analyze", "all"},
+        "wheel": {"preflight", "terrain", "wheel", "compaction", "all"},
+    }
+    if args.stage not in valid_stages[args.kind]:
+        raise SystemExit(f"Stage {args.stage!r} is not valid for {args.kind} queues")
     project_root = Path(__file__).resolve().parent
     queue = json.loads(args.queue.read_text())
     manifests = queue["manifests"]
@@ -61,11 +80,15 @@ def main() -> int:
     for index in selection:
         manifest = project_root / manifests[index]
         case_id = json.loads(manifest.read_text())["case_id"]
-        if completed(project_root, args.kind, case_id, env) and not args.overwrite:
+        if (
+            args.stage == "all"
+            and completed(project_root, args.kind, case_id, env)
+            and not args.overwrite
+        ):
             print(f"SKIP completed: {case_id}", flush=True)
             outcomes.append({"case_id": case_id, "status": "SKIPPED_COMPLETED"})
             continue
-        command = [str(wrapper), str(manifest), "--stage", "all"]
+        command = [str(wrapper), str(manifest), "--stage", args.stage]
         if args.overwrite:
             command.append("--overwrite")
         print(f"RUN {index + 1}/{len(manifests)}: {case_id}", flush=True)
@@ -80,7 +103,7 @@ def main() -> int:
         print(json.dumps(outcome, sort_keys=True), flush=True)
         if result.returncode and not args.continue_on_error:
             break
-        if args.kind == "wheel" and result.returncode == 0:
+        if args.kind == "wheel" and args.stage == "all" and result.returncode == 0:
             output_root = Path(
                 env.get("GRASP_DEM_OUTPUT_ROOT", str(Path.home() / "grasp-dem-runs"))
             )

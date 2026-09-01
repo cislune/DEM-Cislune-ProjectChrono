@@ -31,6 +31,11 @@ def prepare_manifest(
     random_seed: int = 77,
 ) -> Path:
     source_path, case = find_smooth_manifest(queue_path)
+    project_root = queue_path.parents[2].resolve()
+    try:
+        source_reference = str(source_path.resolve().relative_to(project_root))
+    except ValueError:
+        source_reference = str(source_path.resolve())
     case = copy.deepcopy(case)
     particle_radius_mm = float(case["terrain"]["base_particle_radius_m"]) * 1000.0
     radius_label = f"{particle_radius_mm:g}".replace(".", "p")
@@ -55,7 +60,7 @@ def prepare_manifest(
     case["terrain"]["compression_release_margin"] = release_margin
     case["terrain"]["random_seed"] = random_seed
     case["shared_bed_generation"] = {
-        "source_manifest": str(source_path.resolve()),
+        "source_manifest": source_reference,
         "source_manifest_sha256": sha256_file(source_path),
         "release_margin": release_margin,
         "random_seed": random_seed,

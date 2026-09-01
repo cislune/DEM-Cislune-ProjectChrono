@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 import run_case_queue as queue
 
@@ -13,6 +14,17 @@ class RunCaseQueueTests(unittest.TestCase):
     def test_rejects_out_of_range(self):
         with self.assertRaises(ValueError):
             queue.parse_selection("0", 3)
+
+    def test_stage_defaults_to_all(self):
+        with patch("sys.argv", ["run_case_queue.py", "queue.json", "--kind", "wheel"]):
+            self.assertEqual(queue.parse_args().stage, "all")
+
+    def test_terrain_stage_is_selectable(self):
+        with patch(
+            "sys.argv",
+            ["run_case_queue.py", "queue.json", "--kind", "wheel", "--stage", "terrain"],
+        ):
+            self.assertEqual(queue.parse_args().stage, "terrain")
 
 
 if __name__ == "__main__":
