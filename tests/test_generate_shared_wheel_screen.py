@@ -12,7 +12,10 @@ def test_prepare_manifest_uses_smooth_case_and_release_margin(tmp_path):
         json.dumps(
             {
                 "case_id": "screen-smooth_control-coarse-cpt-informed",
-                "terrain": {"compression_release_margin": 0.0},
+                "terrain": {
+                    "base_particle_radius_m": 0.004,
+                    "compression_release_margin": 0.0,
+                },
             }
         )
     )

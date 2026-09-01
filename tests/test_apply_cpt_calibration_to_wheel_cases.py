@@ -59,6 +59,7 @@ def test_creates_provenanced_case_without_overwriting_source(tmp_path):
 
     assert json.loads(source.read_text()) == original
     assert case["terrain"]["youngs_modulus_pa"] == 3e8
+    assert "4 mm particle resolution" in case["purpose"]
     assert case["cpt_calibration_provenance"]["resolution_transfer"][
         "absolute_prediction_status"
     ].startswith("WITHHELD")

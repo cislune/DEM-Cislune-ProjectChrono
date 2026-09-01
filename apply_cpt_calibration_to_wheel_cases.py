@@ -54,12 +54,14 @@ def create_cases(
         case = copy.deepcopy(json.loads(source.read_text()))
         case["case_id"] += "-cpt-informed"
         case["model_status"] = "cpt_informed_resolution_transfer_screen"
+        terrain = case["terrain"]
+        wheel_particle_radius_mm = float(terrain["base_particle_radius_m"]) * 1000.0
         case["purpose"] = (
-            "Comparative wheel screen using the CPT-selected contact parameters. The 4 mm "
-            "particle resolution is an acceleration layer; absolute compaction prediction "
+            "Comparative wheel screen using the CPT-selected contact parameters. The "
+            f"{wheel_particle_radius_mm:g} mm particle resolution is an acceleration layer; "
+            "absolute compaction prediction "
             "remains withheld until a finalist passes a 2 mm and physical validation check."
         )
-        terrain = case["terrain"]
         for key in MATERIAL_KEYS:
             terrain[key] = selected[key]
         terrain["calibration_status"] = (

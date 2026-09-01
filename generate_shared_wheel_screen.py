@@ -32,11 +32,16 @@ def prepare_manifest(
 ) -> Path:
     source_path, case = find_smooth_manifest(queue_path)
     case = copy.deepcopy(case)
+    particle_radius_mm = float(case["terrain"]["base_particle_radius_m"]) * 1000.0
+    radius_label = f"{particle_radius_mm:g}".replace(".", "p")
     seed_suffix = "" if random_seed == 77 else f"-seed{random_seed}"
-    case["case_id"] = f"wheel-shared-bed-r4mm-cpt-informed{seed_suffix}"
+    case["case_id"] = (
+        f"wheel-shared-bed-r{radius_label}mm-cpt-informed{seed_suffix}"
+    )
     case["model_status"] = "cpt_informed_shared_bed_preparation"
     case["purpose"] = (
-        "Prepare one reproducible wheel-scale 4 mm bed for the accelerated comparative screen. "
+        f"Prepare one reproducible wheel-scale {particle_radius_mm:g} mm bed for the "
+        "accelerated comparative screen. "
         "No wheel result is interpreted from this terrain-only case."
     )
     case["terrain"].pop("initial_state_csv", None)
@@ -47,6 +52,7 @@ def prepare_manifest(
         "source_manifest_sha256": sha256_file(source_path),
         "release_margin": release_margin,
         "random_seed": random_seed,
+        "particle_radius_m": case["terrain"]["base_particle_radius_m"],
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(case, indent=2, sort_keys=True) + "\n")
