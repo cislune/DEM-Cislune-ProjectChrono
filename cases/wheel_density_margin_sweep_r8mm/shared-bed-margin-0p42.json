@@ -3,9 +3,9 @@
     "density_gate_affects_status": false,
     "minimum_lane_particles": 5
   },
-  "case_id": "wheel-shared-bed-r8mm-cpt-informed-process-dt5us-margin0p8",
+  "case_id": "wheel-shared-bed-r8mm-cpt-informed-process-dt5us-margin0p42",
   "density_margin_sweep": {
-    "compression_release_margin": 0.8,
+    "compression_release_margin": 0.42,
     "random_seed": 77
   },
   "model_status": "density_preparation_margin_sweep",
@@ -26,7 +26,7 @@
   "shared_bed_generation": {
     "particle_radius_m": 0.008,
     "random_seed": 77,
-    "release_margin": 0.8,
+    "release_margin": 0.42,
     "source_manifest": "cases/wheel_phase_screen_r8mm_dt5us_1p2s/process-smooth_control-r8mm-dt5us-phase1p2s.json",
     "source_manifest_sha256": "05276530a3543723e672fdcf924ad551d8d54e7896a07d5d6334e76f901b6f1b"
   },
@@ -47,7 +47,7 @@
     "cohesion": 0.0,
     "compression_frame_time_s": 0.0005,
     "compression_max_time_s": 1.5,
-    "compression_release_margin": 0.8,
+    "compression_release_margin": 0.42,
     "compression_speed_m_s": 0.1,
     "initial_fill_height_m": 0.085,
     "initial_solid_fraction": 0.55,

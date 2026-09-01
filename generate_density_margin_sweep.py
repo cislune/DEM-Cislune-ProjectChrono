@@ -7,7 +7,7 @@ import argparse
 import json
 from pathlib import Path
 
-from generate_shared_wheel_screen import prepare_manifest
+from generate_shared_wheel_screen import find_smooth_manifest, prepare_manifest
 
 
 def margin_label(value: float) -> str:
@@ -26,6 +26,18 @@ def generate_sweep(
         raise ValueError("Release margins must be nonnegative")
     if len(set(margins)) != len(margins):
         raise ValueError("Release margins must be unique")
+
+    _, source_case = find_smooth_manifest(queue_path)
+    terrain = source_case["terrain"]
+    target_density = float(terrain["target_bulk_density_kg_m3"])
+    particle_density = float(terrain["particle_density_kg_m3"])
+    requested_density = target_density * (1.0 + max(margins))
+    if requested_density >= particle_density:
+        maximum = particle_density / target_density - 1.0
+        raise ValueError(
+            "Release margin requests a compressed bulk density at or above the "
+            f"particle material density; margin must be below {maximum:.6g}"
+        )
 
     project_root = queue_path.parents[2]
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -74,7 +86,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--queue", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
-    parser.add_argument("--margins", default="0.18,0.35,0.55,0.8")
+    parser.add_argument("--margins", default="0.18,0.35,0.42,0.55")
     parser.add_argument("--random-seed", type=int, default=77)
     return parser.parse_args()
 

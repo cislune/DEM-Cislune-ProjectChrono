@@ -19,6 +19,8 @@ def source_queue(tmp_path):
                     "base_particle_radius_m": 0.008,
                     "time_step_s": 0.000005,
                     "compression_release_margin": 0.18,
+                    "particle_density_kg_m3": 2750.0,
+                    "target_bulk_density_kg_m3": 1700.0,
                 },
             }
         )
@@ -48,3 +50,9 @@ def test_generate_sweep_rejects_duplicate_margins(tmp_path):
     _, queue = source_queue(tmp_path)
     with pytest.raises(ValueError, match="unique"):
         generate_sweep(queue, tmp_path / "out", [0.18, 0.18])
+
+
+def test_generate_sweep_rejects_impossible_compressed_density(tmp_path):
+    _, queue = source_queue(tmp_path)
+    with pytest.raises(ValueError, match="particle material density"):
+        generate_sweep(queue, tmp_path / "out", [0.8])
