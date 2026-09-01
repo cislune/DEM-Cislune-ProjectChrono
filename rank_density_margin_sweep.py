@@ -24,6 +24,10 @@ def collect(output_root: Path) -> list[dict]:
         rows.append(
             {
                 "case_id": case["case_id"],
+                "base_particle_radius_m": float(
+                    case["terrain"]["base_particle_radius_m"]
+                ),
+                "time_step_s": float(case["terrain"]["time_step_s"]),
                 "compression_release_margin": margin,
                 "target_bulk_density_kg_m3": target,
                 "post_release_bulk_density_kg_m3": achieved,

@@ -11,7 +11,11 @@ def write_case(root, name, margin, achieved):
         json.dumps(
             {
                 "case_id": name,
-                "terrain": {"compression_release_margin": margin},
+                "terrain": {
+                    "base_particle_radius_m": 0.008,
+                    "time_step_s": 0.000005,
+                    "compression_release_margin": margin,
+                },
             }
         )
     )
@@ -38,6 +42,8 @@ def test_write_outputs_creates_json_and_csv(tmp_path):
     rows = [
         {
             "case_id": "case",
+            "base_particle_radius_m": 0.008,
+            "time_step_s": 0.000005,
             "compression_release_margin": 0.5,
             "target_bulk_density_kg_m3": 1700.0,
             "post_release_bulk_density_kg_m3": 1690.0,

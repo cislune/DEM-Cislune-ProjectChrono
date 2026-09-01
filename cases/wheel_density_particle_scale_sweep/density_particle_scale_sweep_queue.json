@@ -1,0 +1,9 @@
+{
+  "manifests": [
+    "cases/wheel_density_particle_scale_sweep/wheel-shared-bed-density-scale-r8mm-dt5us.json",
+    "cases/wheel_density_particle_scale_sweep/wheel-shared-bed-density-scale-r6mm-dt3p75us.json",
+    "cases/wheel_density_particle_scale_sweep/wheel-shared-bed-density-scale-r4mm-dt2p5us.json"
+  ],
+  "run_policy": "Run terrain stage only. Begin with 6 mm; run 4 mm only if the density trend justifies the added particle count.",
+  "schema_version": 1
+}
