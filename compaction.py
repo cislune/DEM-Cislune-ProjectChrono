@@ -3,8 +3,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import pyvista as pv
 import config as c
+from vtk_points import read_ascii_vtk_point_centroid
 
 #----------------------------------------------------------------------------------------------------------------------------
 # PATHS (define project root, locate simulation outputs, and prepare output directories for compaction post-processing)
@@ -330,16 +330,9 @@ def read_wheel_center_from_vtk(path: Path):
         return None
 
     try:
-        mesh = pv.read(path)
-        # read the VTK wheel mesh using PyVista
-
-        if mesh.points is None or len(mesh.points) == 0:
-            # empty mesh -> cannot infer wheel center
-            return None
-
-        # approximate wheel center as the centroid of all wheel-mesh vertices
-        # sufficient for overlaying wheel path on compaction maps
-        return np.asarray(mesh.points, dtype=float).mean(axis=0)
+        # DEME writes legacy ASCII VTK. Reading only the POINTS block avoids
+        # loading the native VTK/PyVista stack during lightweight analysis.
+        return read_ascii_vtk_point_centroid(path)
 
     except Exception:
         # fail gracefully if a VTK file cannot be read
