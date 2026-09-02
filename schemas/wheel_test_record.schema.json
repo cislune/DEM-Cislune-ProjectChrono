@@ -29,6 +29,8 @@
       "required": ["campaign_id", "facility", "test_date", "operator", "objective"],
       "properties": {
         "campaign_id": {"type": "string"},
+        "replicate_id": {"type": "string"},
+        "wheel_order_index": {"type": "integer", "minimum": 1},
         "facility": {"enum": ["DEM", "CRATR", "RIDER", "other"]},
         "test_date": {"type": "string", "format": "date"},
         "operator": {"type": "string"},
@@ -60,6 +62,8 @@
       "properties": {
         "material_id": {"type": "string"},
         "lot_id": {"type": "string"},
+        "preparation_id": {"type": "string"},
+        "prepared_by": {"type": "string"},
         "dry_mass_kg": {"type": "number", "exclusiveMinimum": 0},
         "moisture_mass_fraction": {"type": "number", "minimum": 0, "maximum": 1},
         "particle_density_kg_m3": {"type": "number", "exclusiveMinimum": 0},
@@ -68,6 +72,8 @@
         "fill_depth_m": {"type": "number", "exclusiveMinimum": 0},
         "preparation_method": {"type": "string"},
         "reset_method": {"type": "string"},
+        "reset_before_record": {"type": "boolean"},
+        "reset_during_pass_sequence": {"type": "boolean"},
         "initial_state": {
           "type": "object",
           "additionalProperties": false,
@@ -104,7 +110,12 @@
         "slip_target": {"type": "number"},
         "slip_mean": {"type": "number"},
         "passes": {"type": "integer", "minimum": 1},
-        "travel_distance_m": {"type": "number", "exclusiveMinimum": 0}
+        "travel_distance_m": {"type": "number", "exclusiveMinimum": 0},
+        "checkpoint_passes": {
+          "type": "array",
+          "items": {"type": "integer", "minimum": 0},
+          "uniqueItems": true
+        }
       }
     },
     "instrumentation": {
@@ -121,9 +132,13 @@
             "required": ["sensor_id", "quantity", "units", "calibration_date", "sample_rate_hz"],
             "properties": {
               "sensor_id": {"type": "string"},
+              "instrument_model": {"type": "string"},
+              "serial_number": {"type": "string"},
               "quantity": {"type": "string"},
               "units": {"type": "string"},
               "calibration_date": {"type": "string", "format": "date"},
+              "calibration_file": {"type": ["string", "null"]},
+              "tare_method": {"type": ["string", "null"]},
               "sample_rate_hz": {"type": "number", "exclusiveMinimum": 0}
             }
           }
@@ -142,6 +157,24 @@
         "energy_per_distance_j_m": {"type": "number", "minimum": 0},
         "transported_volume_m3": {"type": ["number", "null"]},
         "lateral_disturbance_m3": {"type": ["number", "null"]},
+        "checkpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["passes_completed", "geotech_measurements"],
+            "properties": {
+              "passes_completed": {"type": "integer", "minimum": 0},
+              "surface_profile_file": {"type": ["string", "null"]},
+              "rut_depth_m": {"type": ["number", "null"]},
+              "rut_width_m": {"type": ["number", "null"]},
+              "geotech_measurements": {
+                "type": "array",
+                "items": {"$ref": "#/$defs/geotechMeasurement"}
+              }
+            }
+          }
+        },
         "post_state": {
           "type": "object",
           "additionalProperties": false,
@@ -186,8 +219,17 @@
       "required": ["method", "x_m", "y_m", "value", "units"],
       "properties": {
         "method": {"enum": ["CPT", "density", "other"]},
+        "measurement_id": {"type": "string"},
+        "instrument_id": {"type": "string"},
+        "station_id": {"type": "string"},
         "x_m": {"type": "number"},
         "y_m": {"type": "number"},
+        "track_relation": {"enum": ["in_track", "adjacent_control", "off_track", "other"]},
+        "depth_m": {"type": ["number", "null"], "minimum": 0},
+        "reduction_method": {"type": ["string", "null"]},
+        "raw_profile_file": {"type": ["string", "null"]},
+        "location_used_previously": {"type": "boolean"},
+        "hole_treatment_after_measurement": {"type": ["string", "null"]},
         "value": {"type": "number"},
         "units": {"type": "string"}
       }
