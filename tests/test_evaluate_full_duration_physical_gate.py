@@ -3,6 +3,10 @@ from evaluate_full_duration_physical_gate import evaluate
 
 def manifest(reference=0.7025, active_reference=0.825):
     return {
+        "case_id": "alabama-wheel-mu0p9",
+        "model_status": "full_duration_local_wheel_friction_sensitivity",
+        "terrain": {"wheel_friction": 0.9},
+        "solver": {"cd_update_frequency": 1},
         "sequence_condition": {
             "measured_steady_tare_corrected_median_abs_torque_nm": reference,
             "measured_tare_corrected_median_abs_torque_nm": active_reference,
@@ -29,6 +33,9 @@ def test_passes_repeatable_prediction_below_physical_upper_bound():
     )
     assert len(result["minimum_next_physical_record"]) == 5
     assert result["rider_active_tare_corrected_upper_bound_nm"] == 0.825
+    assert result["case_id"] == "alabama-wheel-mu0p9"
+    assert result["wheel_friction"] == 0.9
+    assert result["solver_execution"]["cd_update_frequency"] == 1
 
 
 def test_rejects_prediction_that_exceeds_upper_bound_tolerance():

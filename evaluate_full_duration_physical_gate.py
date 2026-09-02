@@ -42,6 +42,10 @@ def evaluate(summary: dict, manifest: dict, upper_bound_tolerance: float = 0.20)
 
     return {
         "schema_version": 1,
+        "case_id": manifest.get("case_id"),
+        "model_status": manifest.get("model_status"),
+        "wheel_friction": (manifest.get("terrain") or {}).get("wheel_friction"),
+        "solver_execution": manifest.get("solver"),
         "status": status,
         "numerical_repeatability_status": summary.get("status"),
         "physical_plausibility_status": physical_status,
