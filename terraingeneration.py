@@ -1,4 +1,5 @@
 import config as c
+from solver_execution import configure_solver_execution
 import DEME
 from DEME import PDSampler
 import csv
@@ -50,6 +51,7 @@ solver.SetMaxVelocity(c.MAX_VELOCITY_st)
 solver.SetErrorOutVelocity(c.ERROR_OUT_VELOCITY_st)
 solver.SetInitTimeStep(c.STEP_SIZE_st)
 solver.SetGravitationalAcceleration(c.GRAVITATIONAL_ACCELERATION_st)
+configure_solver_execution(solver, c)
 
 
 # ----------------------------------------------------------------------------------------------------------------------------

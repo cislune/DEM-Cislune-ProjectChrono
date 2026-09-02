@@ -40,6 +40,7 @@ SIMULATION_SOURCE_FILES = (
     "csv_vtk.py",
     "dem_case_runner.py",
     "slipsinkage.py",
+    "solver_execution.py",
     "terraingeneration.py",
     "vtk_points.py",
 )
@@ -713,6 +714,17 @@ def apply_case_config(config: Any, case: dict[str, Any], paths: dict[str, Path])
     config.ERROR_OUT_VELOCITY_st = float(solver.get("error_out_velocity_m_s", 30.0))
     config.MAX_TRIANGLES_IN_BIN_st = int(solver.get("max_triangles_in_bin", 100000))
     config.ERROR_OUT_AVG_CONTACTS_st = float(solver.get("error_out_avg_contacts", 100.0))
+    config.SOLVER_USE_CUB_FORCE_COLLECTION_st = solver.get(
+        "use_cub_force_collection"
+    )
+    config.SOLVER_SORT_CONTACT_PAIRS_st = solver.get("sort_contact_pairs")
+    config.SOLVER_DISABLE_ADAPTIVE_BIN_SIZE_st = bool(
+        solver.get("disable_adaptive_bin_size", False)
+    )
+    config.SOLVER_CD_UPDATE_FREQUENCY_st = solver.get("cd_update_frequency")
+    config.SOLVER_DISABLE_ADAPTIVE_UPDATE_FREQUENCY_st = bool(
+        solver.get("disable_adaptive_update_frequency", False)
+    )
     config.TERRAIN_RANDOM_SEED_st = int(terrain.get("random_seed", 77))
     config.TERRAIN_SETTLE_TIME_S_st = float(terrain.get("settle_time_s", 1.0))
     target_density = terrain.get("target_bulk_density_kg_m3")

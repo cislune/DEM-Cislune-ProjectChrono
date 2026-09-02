@@ -33,9 +33,7 @@ def evaluate(
 ) -> dict:
     grouped: dict[str, list[dict]] = {}
     expected = {}
-    for result_path in sorted(
-        output_root.glob("repeatability-*-r*/wheel_performance.json")
-    ):
+    for result_path in sorted(output_root.glob("*-r*/wheel_performance.json")):
         result = json.loads(result_path.read_text())
         manifest = json.loads((result_path.parent / "frozen_case.json").read_text())
         target = manifest.get("repeatability_target")
@@ -45,6 +43,9 @@ def evaluate(
         expected[candidate] = int(target["replicates_requested"])
         grouped.setdefault(candidate, []).append(
             {
+                "execution_profile": target.get(
+                    "execution_profile", "repeatability"
+                ),
                 "replicate": int(target["replicate"]),
                 "torque_nm": float(result["mobility"]["torque_y_nm"]["median_abs"]),
                 "drawbar_to_normal": float(
@@ -94,6 +95,7 @@ def evaluate(
         revisions = sorted(
             {row["project_git_revision"] for row in rows if row["project_git_revision"]}
         )
+        execution_profiles = sorted({row["execution_profile"] for row in rows})
         issues = []
         if len(replicate_numbers) != len(set(replicate_numbers)):
             issues.append("DUPLICATE_REPLICATE_NUMBER")
@@ -111,6 +113,8 @@ def evaluate(
             issues.append("MIXED_SHARED_BED_HASH")
         if any(row["project_git_dirty"] is True for row in rows):
             issues.append("DIRTY_PROJECT_SOURCE")
+        if len(execution_profiles) > 1:
+            issues.append("MIXED_EXECUTION_PROFILE")
 
         torque = variation([row["torque_nm"] for row in rows])
         column_strain = variation([row["column_strain_proxy"] for row in rows])
@@ -154,6 +158,7 @@ def evaluate(
                 "simulation_source_hashes": simulation_hashes,
                 "analysis_source_hashes": analysis_hashes,
                 "project_git_revisions": revisions,
+                "execution_profiles": execution_profiles,
                 "shared_bed_state_hashes": bed_hashes,
                 "quality_gate": {
                     "status": "PASS_PROVISIONAL" if not issues else "REJECT",
@@ -178,6 +183,13 @@ def evaluate(
         "schema_version": 1,
         "status": status,
         "evidence_role": "same_bed_numerical_repeatability",
+        "execution_profiles": sorted(
+            {
+                profile
+                for candidate in candidates
+                for profile in candidate["execution_profiles"]
+            }
+        ),
         "decision_gate": {
             "purpose": (
                 "Proceed to wheel ranking and a bounded physical retest only after fixed-bed "
@@ -203,6 +215,7 @@ def write(result: dict, json_path: Path, csv_path: Path) -> None:
         rows.append(
             {
                 "candidate": candidate["candidate"],
+                "execution_profiles": ";".join(candidate["execution_profiles"]),
                 "completed_replicates": candidate["completed_replicates"],
                 "torque_cv": candidate["torque_nm"]["coefficient_of_variation"],
                 "drawbar_cv": candidate["drawbar_to_normal"][

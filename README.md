@@ -56,6 +56,27 @@ Use `schemas/wheel_test_record.schema.json` as the common record for CRATR,
 RIDER, geotechnical measurements, and DEM results. The project-level controlled
 test card owns provisional thresholds and approval status.
 
+## Numerical Repeatability Diagnostic
+
+Before interpreting small differences between wheels, run the same wheel cases
+three times against one byte-identical settled bed. The standard queue preserves
+DEME defaults. The `repeatability-cub` queue uses CUB force reduction and sorted
+contact pairs to test whether GPU accumulation order is a material source of
+run-to-run spread.
+
+```bash
+python generate_wheel_repeatability_cases.py \
+  --source-queue cases/frozen_candidate_screen_mu0p9_r8mm/frozen_candidate_screen_queue.json \
+  --output-dir cases/wheel_repeatability_cub_r8mm \
+  --bed-case-id wheel-shared-bed-r8mm-cpt-informed-process-dt5us-margin0p18 \
+  --bed-state-sha256 f43125a9acd2e84d84633b794e8c3a25498fee1cd8c74b05ddd64476e108a7ff \
+  --case-prefix repeatability-cub \
+  --use-cub-force-collection
+```
+
+Evaluate standard and CUB outputs separately. Treat a lower spread as a numerical
+stability result; it does not replace multi-bed or held-out physical validation.
+
 ## Tests
 
 ```bash
