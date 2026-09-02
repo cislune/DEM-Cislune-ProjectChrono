@@ -6,6 +6,9 @@ from typing import Any
 
 
 def configure_solver_execution(solver: Any, config: Any) -> dict[str, Any]:
+    contact_force_model = getattr(
+        config, "SOLVER_CONTACT_FORCE_MODEL_st", "frictional_hertzian"
+    )
     use_cub = getattr(config, "SOLVER_USE_CUB_FORCE_COLLECTION_st", None)
     sort_contacts = getattr(config, "SOLVER_SORT_CONTACT_PAIRS_st", None)
     disable_adaptive_bin = bool(
@@ -16,6 +19,12 @@ def configure_solver_execution(solver: Any, config: Any) -> dict[str, Any]:
         getattr(config, "SOLVER_DISABLE_ADAPTIVE_UPDATE_FREQUENCY_st", False)
     )
 
+    if contact_force_model == "frictional_hertzian":
+        solver.UseFrictionalHertzianModel()
+    elif contact_force_model == "frictionless_hertzian":
+        solver.UseFrictionlessHertzianModel()
+    else:
+        raise ValueError(f"Unsupported contact force model: {contact_force_model}")
     if use_cub is not None:
         solver.UseCubForceCollection(bool(use_cub))
     if sort_contacts is not None:
@@ -27,6 +36,7 @@ def configure_solver_execution(solver: Any, config: Any) -> dict[str, Any]:
     if disable_adaptive_update:
         solver.DisableAdaptiveUpdateFreq()
     return {
+        "contact_force_model": contact_force_model,
         "use_cub_force_collection": (
             bool(use_cub) if use_cub is not None else None
         ),

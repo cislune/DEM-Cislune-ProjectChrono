@@ -440,6 +440,22 @@ def preflight_case(
     if int(test.get("passes", 1)) < 1:
         failures.append("passes must be at least 1")
 
+    solver = case.get("solver", {})
+    contact_force_model = solver.get(
+        "contact_force_model", "frictional_hertzian"
+    )
+    if contact_force_model not in {
+        "frictional_hertzian",
+        "frictionless_hertzian",
+    }:
+        failures.append(
+            f"unsupported solver contact_force_model: {contact_force_model}"
+        )
+    if contact_force_model == "frictionless_hertzian":
+        warnings.append(
+            "frictionless_hertzian is a numerical isolation diagnostic; do not use its torque as a mobility prediction"
+        )
+
     gravity = float(test["gravity_m_s2"])
     normal_load = float(test["normal_load_n"])
     linear_speed = float(test["linear_speed_m_s"])
@@ -710,6 +726,9 @@ def apply_case_config(config: Any, case: dict[str, Any], paths: dict[str, Path])
 
     output = case.get("output", {})
     solver = case.get("solver", {})
+    config.SOLVER_CONTACT_FORCE_MODEL_st = solver.get(
+        "contact_force_model", "frictional_hertzian"
+    )
     config.MAX_VELOCITY_st = float(solver.get("max_velocity_m_s", 30.0))
     config.ERROR_OUT_VELOCITY_st = float(solver.get("error_out_velocity_m_s", 30.0))
     config.MAX_TRIANGLES_IN_BIN_st = int(solver.get("max_triangles_in_bin", 100000))

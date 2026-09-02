@@ -27,6 +27,7 @@ def test_configure_solver_execution_applies_deterministic_profile():
     applied = configure_solver_execution(solver, config)
 
     assert solver.calls == [
+        ("UseFrictionalHertzianModel", ()),
         ("UseCubForceCollection", (True,)),
         ("SetSortContactPairs", (True,)),
         ("DisableAdaptiveBinSize", ()),
@@ -34,6 +35,7 @@ def test_configure_solver_execution_applies_deterministic_profile():
         ("DisableAdaptiveUpdateFreq", ()),
     ]
     assert applied == {
+        "contact_force_model": "frictional_hertzian",
         "use_cub_force_collection": True,
         "sort_contact_pairs": True,
         "disable_adaptive_bin_size": True,
@@ -47,6 +49,19 @@ def test_configure_solver_execution_keeps_backward_compatible_defaults():
 
     applied = configure_solver_execution(solver, SimpleNamespace())
 
-    assert solver.calls == []
+    assert solver.calls == [("UseFrictionalHertzianModel", ())]
+    assert applied["contact_force_model"] == "frictional_hertzian"
     assert applied["use_cub_force_collection"] is None
     assert applied["sort_contact_pairs"] is None
+
+
+def test_configure_solver_execution_selects_frictionless_diagnostic():
+    solver = FakeSolver()
+    config = SimpleNamespace(
+        SOLVER_CONTACT_FORCE_MODEL_st="frictionless_hertzian"
+    )
+
+    applied = configure_solver_execution(solver, config)
+
+    assert solver.calls == [("UseFrictionlessHertzianModel", ())]
+    assert applied["contact_force_model"] == "frictionless_hertzian"
