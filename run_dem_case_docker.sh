@@ -6,6 +6,7 @@ IMAGE=${GRASP_DEM_IMAGE:-dem-simulation:latest}
 OUTPUT_ROOT=${GRASP_DEM_OUTPUT_ROOT:-"$HOME/grasp-dem-runs"}
 CACHE_ROOT=${GRASP_DEM_CACHE_ROOT:-"$HOME/grasp-dem-cache"}
 MAX_WALL_S=${GRASP_DEM_MAX_WALL_S:-}
+SILENCE_TIMEOUT_S=${GRASP_DEM_SILENCE_TIMEOUT_S:-}
 CUDA_HOME_IN_CONTAINER=/root/miniconda3/envs/myenv/targets/x86_64-linux
 PYTHON_IN_CONTAINER=/root/miniconda3/envs/myenv/bin/python
 GIT_REVISION=$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || true)
@@ -63,6 +64,10 @@ if [[ -n $MAX_WALL_S && ( ! $MAX_WALL_S =~ ^[1-9][0-9]*$ ) ]]; then
     echo "GRASP_DEM_MAX_WALL_S must be a positive integer" >&2
     exit 64
 fi
+if [[ -n $SILENCE_TIMEOUT_S && ( ! $SILENCE_TIMEOUT_S =~ ^[1-9][0-9]*$ ) ]]; then
+    echo "GRASP_DEM_SILENCE_TIMEOUT_S must be a positive integer" >&2
+    exit 64
+fi
 
 cleanup_container() {
     if [[ -s $cidfile ]]; then
@@ -85,12 +90,18 @@ docker_command=(docker run --rm --cidfile "$cidfile" --gpus all \
     "$IMAGE" \
     "$PYTHON_IN_CONTAINER" -u /workspace/dem_case_runner.py "/workspace/$manifest_rel" \
     --output-root /outputs "$@")
+supervised_command=("${docker_command[@]}")
+if [[ -n $SILENCE_TIMEOUT_S ]]; then
+    printf 'silence_timeout_s=%s\n' "$SILENCE_TIMEOUT_S" | tee -a "$log_path"
+    supervised_command=(python3 "$ROOT/run_with_inactivity_timeout.py" \
+        --inactivity-timeout-s "$SILENCE_TIMEOUT_S" -- "${docker_command[@]}")
+fi
 if [[ -n $MAX_WALL_S ]]; then
     printf 'max_wall_s=%s\n' "$MAX_WALL_S" | tee -a "$log_path"
-    timeout --signal=TERM --kill-after=10 "$MAX_WALL_S" "${docker_command[@]}" \
+    timeout --signal=TERM --kill-after=10 "$MAX_WALL_S" "${supervised_command[@]}" \
         2>&1 | tee -a "$log_path"
 else
-    "${docker_command[@]}" 2>&1 | tee -a "$log_path"
+    "${supervised_command[@]}" 2>&1 | tee -a "$log_path"
 fi
 status=${PIPESTATUS[0]}
 set -e
