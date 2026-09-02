@@ -60,6 +60,19 @@ def evaluate(output_root: Path) -> dict:
             "median_observed_corrected_torque_upper_bound_nm": observed,
             "predicted_to_observed_ratio": predicted / observed,
             "relative_error": abs(predicted - observed) / observed,
+            "median_lap_relative_error": statistics.median(
+                row["relative_error"] for row in selected
+            ),
+            "maximum_lap_relative_error": max(
+                row["relative_error"] for row in selected
+            ),
+            "laps_within_20_percent_fraction": sum(
+                row["relative_error"] <= 0.20 for row in selected
+            )
+            / len(selected),
+            "outlier_laps_over_50_percent": [
+                row["lap"] for row in selected if row["relative_error"] > 0.50
+            ],
         }
 
     cumulative_density_ratio = 1.0
@@ -69,15 +82,30 @@ def evaluate(output_root: Path) -> dict:
     density_mismatch = any(
         row["density_gate_status"] != "PASS_DENSITY" for row in rows
     )
+    held_out = summaries.get("held_out_validation")
+    if not all_complete or held_out is None:
+        torque_validation_status = "PARTIAL"
+    elif (
+        held_out["relative_error"] <= 0.10
+        and held_out["laps_within_20_percent_fraction"] >= 0.80
+    ):
+        torque_validation_status = (
+            "PASS_MEDIAN_WITH_OUTLIER"
+            if held_out["outlier_laps_over_50_percent"]
+            else "PASS"
+        )
+    else:
+        torque_validation_status = "FAIL"
     return {
         "schema_version": 1,
         "status": (
-            "COMPLETE_PILOT_DENSITY_MISMATCH"
+            f"COMPLETE_{torque_validation_status}_DENSITY_MISMATCH"
             if all_complete and density_mismatch
-            else "COMPLETE"
+            else f"COMPLETE_{torque_validation_status}"
             if all_complete
             else "PARTIAL"
         ),
+        "torque_validation_status": torque_validation_status,
         "completed_laps": [row["lap"] for row in rows],
         "summaries": summaries,
         "compaction": {
