@@ -26,7 +26,11 @@ def variation(values: list[float]) -> dict:
     }
 
 
-def evaluate(output_root: Path) -> dict:
+def evaluate(
+    output_root: Path,
+    torque_cv_limit: float = 0.15,
+    column_strain_range_limit: float = 0.03,
+) -> dict:
     grouped: dict[str, list[dict]] = {}
     expected = {}
     for result_path in sorted(
@@ -54,51 +58,135 @@ def evaluate(output_root: Path) -> dict:
                 "analysis_source_sha256": (
                     result.get("analysis_source_provenance") or {}
                 ).get("combined_sha256"),
+                "project_git_revision": result.get("project_git_revision"),
+                "project_git_dirty": result.get("project_git_dirty"),
+                "shared_bed_state_sha256": target.get("shared_bed_state_sha256"),
                 "result_json": str(result_path),
             }
         )
 
     candidates = []
+    campaign_issues = []
     for candidate, rows in sorted(grouped.items()):
         rows.sort(key=lambda row: row["replicate"])
+        replicate_numbers = [row["replicate"] for row in rows]
+        simulation_hashes = sorted(
+            {
+                row["simulation_source_sha256"]
+                for row in rows
+                if row["simulation_source_sha256"]
+            }
+        )
+        analysis_hashes = sorted(
+            {
+                row["analysis_source_sha256"]
+                for row in rows
+                if row["analysis_source_sha256"]
+            }
+        )
+        bed_hashes = sorted(
+            {
+                row["shared_bed_state_sha256"]
+                for row in rows
+                if row["shared_bed_state_sha256"]
+            }
+        )
+        revisions = sorted(
+            {row["project_git_revision"] for row in rows if row["project_git_revision"]}
+        )
+        issues = []
+        if len(replicate_numbers) != len(set(replicate_numbers)):
+            issues.append("DUPLICATE_REPLICATE_NUMBER")
+        if any(row["simulation_source_sha256"] is None for row in rows):
+            issues.append("MISSING_SIMULATION_SOURCE_PROVENANCE")
+        if len(simulation_hashes) > 1:
+            issues.append("MIXED_SIMULATION_SOURCE_PROVENANCE")
+        if any(row["analysis_source_sha256"] is None for row in rows):
+            issues.append("MISSING_ANALYSIS_SOURCE_PROVENANCE")
+        if len(analysis_hashes) > 1:
+            issues.append("MIXED_ANALYSIS_SOURCE_PROVENANCE")
+        if any(row["shared_bed_state_sha256"] is None for row in rows):
+            issues.append("MISSING_SHARED_BED_HASH")
+        if len(bed_hashes) > 1:
+            issues.append("MIXED_SHARED_BED_HASH")
+        if any(row["project_git_dirty"] is True for row in rows):
+            issues.append("DIRTY_PROJECT_SOURCE")
+
+        torque = variation([row["torque_nm"] for row in rows])
+        column_strain = variation([row["column_strain_proxy"] for row in rows])
+        numerical_checks = {
+            "torque_cv": {
+                "value": torque["coefficient_of_variation"],
+                "maximum": torque_cv_limit,
+                "pass": (
+                    torque["coefficient_of_variation"] is not None
+                    and torque["coefficient_of_variation"] <= torque_cv_limit
+                ),
+            },
+            "column_strain_range": {
+                "value": column_strain["range"],
+                "maximum": column_strain_range_limit,
+                "pass": column_strain["range"] <= column_strain_range_limit,
+            },
+        }
+        complete_replicates = replicate_numbers == list(
+            range(1, expected[candidate] + 1)
+        )
+        if not complete_replicates:
+            issues.append("INCOMPLETE_REPLICATES")
+        if complete_replicates and not all(
+            check["pass"] for check in numerical_checks.values()
+        ):
+            issues.append("NUMERICAL_REPEATABILITY_LIMIT_EXCEEDED")
+        campaign_issues.extend(f"{candidate}:{issue}" for issue in issues)
         candidates.append(
             {
                 "candidate": candidate,
                 "completed_replicates": len(rows),
                 "expected_replicates": expected[candidate],
-                "torque_nm": variation([row["torque_nm"] for row in rows]),
+                "replicate_numbers": replicate_numbers,
+                "torque_nm": torque,
                 "drawbar_to_normal": variation(
                     [row["drawbar_to_normal"] for row in rows]
                 ),
-                "column_strain_proxy": variation(
-                    [row["column_strain_proxy"] for row in rows]
-                ),
+                "column_strain_proxy": column_strain,
                 "settlement_m": variation([row["settlement_m"] for row in rows]),
-                "simulation_source_hashes": sorted(
-                    {
-                        row["simulation_source_sha256"]
-                        for row in rows
-                        if row["simulation_source_sha256"]
-                    }
-                ),
-                "analysis_source_hashes": sorted(
-                    {
-                        row["analysis_source_sha256"]
-                        for row in rows
-                        if row["analysis_source_sha256"]
-                    }
-                ),
+                "simulation_source_hashes": simulation_hashes,
+                "analysis_source_hashes": analysis_hashes,
+                "project_git_revisions": revisions,
+                "shared_bed_state_hashes": bed_hashes,
+                "quality_gate": {
+                    "status": "PASS_PROVISIONAL" if not issues else "REJECT",
+                    "issues": issues,
+                    "numerical_checks": numerical_checks,
+                },
                 "replicates": rows,
             }
         )
     complete = bool(candidates) and all(
-        row["completed_replicates"] == row["expected_replicates"]
+        row["replicate_numbers"] == list(range(1, row["expected_replicates"] + 1))
         for row in candidates
+    )
+    status = (
+        "PARTIAL"
+        if not complete
+        else "REJECT_QUALITY_GATE"
+        if campaign_issues
+        else "PASS_PROVISIONAL"
     )
     return {
         "schema_version": 1,
-        "status": "COMPLETE" if complete else "PARTIAL",
+        "status": status,
         "evidence_role": "same_bed_numerical_repeatability",
+        "decision_gate": {
+            "purpose": (
+                "Proceed to wheel ranking and a bounded physical retest only after fixed-bed "
+                "numerical variability and source provenance pass."
+            ),
+            "torque_cv_limit": torque_cv_limit,
+            "column_strain_range_limit": column_strain_range_limit,
+            "issues": campaign_issues,
+        },
         "qualification": (
             "Variability here is numerical run-to-run spread on one fixed coarse bed. "
             "Bed-preparation uncertainty requires separate seed and physical repeats."
@@ -122,6 +210,8 @@ def write(result: dict, json_path: Path, csv_path: Path) -> None:
                 ],
                 "column_strain_range": candidate["column_strain_proxy"]["range"],
                 "settlement_range_m": candidate["settlement_m"]["range"],
+                "quality_gate_status": candidate["quality_gate"]["status"],
+                "quality_gate_issues": ";".join(candidate["quality_gate"]["issues"]),
             }
         )
     if rows:
@@ -136,8 +226,14 @@ def main() -> int:
     parser.add_argument("output_root", type=Path)
     parser.add_argument("--json", type=Path, required=True, dest="json_path")
     parser.add_argument("--csv", type=Path, required=True, dest="csv_path")
+    parser.add_argument("--torque-cv-limit", type=float, default=0.15)
+    parser.add_argument("--column-strain-range-limit", type=float, default=0.03)
     args = parser.parse_args()
-    result = evaluate(args.output_root.resolve())
+    result = evaluate(
+        args.output_root.resolve(),
+        args.torque_cv_limit,
+        args.column_strain_range_limit,
+    )
     write(result, args.json_path.resolve(), args.csv_path.resolve())
     print(result["status"])
     for row in result["candidates"]:

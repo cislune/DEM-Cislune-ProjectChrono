@@ -16,6 +16,8 @@ from evaluate_alabama_lap_sequence import evaluate as evaluate_alabama
 from evaluate_alabama_lap_sequence import write as write_alabama
 from evaluate_candidate_lap_sequences import evaluate as evaluate_candidates
 from evaluate_candidate_lap_sequences import write as write_candidates
+from evaluate_refinement_selection import evaluate as evaluate_refinement_selection
+from evaluate_refinement_selection import write as write_refinement_selection
 
 
 def available_gb(path: Path) -> float:
@@ -178,6 +180,12 @@ def main() -> int:
             status["available_gb"] = available_gb(output_root)
             write_status(status_path, status)
             summarize_sensitivity(results_dir)
+            decision = evaluate_refinement_selection(results_dir, master_path)
+            write_refinement_selection(
+                decision,
+                results_dir / "refinement-decision.json",
+                results_dir / "refinement-decision.csv",
+            )
 
     if args.section in ("all", "candidates"):
         master_path = args.candidate_master.resolve()
