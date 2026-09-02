@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.pytest_cache/
+.venv/
+
+# Generated meshes, case manifests, and simulation output can be large or
+# contain project-specific physical references. Keep them outside the public
+# repository; publish only deliberately sanitized examples.
+case_runs/
+cpt_case_runs/
+cases/
+collision_meshes/
+physical_references/
+results/
+wheel_candidates/
+
+# Local solver diagnostics and exported reference geometry.
+*.provenance.json

@@ -1,0 +1,153 @@
+{
+  "analysis": {
+    "density_gate_affects_status": false,
+    "minimum_lane_particles": 5
+  },
+  "case_id": "alabama-sensitivity-particle_mu0p4-lap07",
+  "cpt_calibration_provenance": {
+    "density_gate_status": "PASS_DENSITY",
+    "post_release_bulk_density_kg_m3": 1654.2078782100054,
+    "q100_ratio_predicted_to_observed": 0.970104009174288,
+    "ranking_file": "/Users/erikfranks/Documents/Codex/2026-07-02/get/work/grasp/dem/DEM-Cislune-ProjectChrono/results/cpt/cpt_calibration_rank.json",
+    "ranking_sha256": "7bb9860444958eaaf9b142b57ad2ea7d65d86a462f5e54633e5c4ad6abcf73bf",
+    "resolution_transfer": {
+      "absolute_prediction_status": "WITHHELD_PENDING_CONVERGENCE_AND_PHYSICAL_VALIDATION",
+      "cpt_particle_radius_m": 0.002,
+      "wheel_particle_radius_m": 0.004
+    },
+    "selected_case_id": "cpt-out-track-e3p8-mu50-rr10-c0-r2mm-shared-bed",
+    "selection_score": 0.9436059348696786
+  },
+  "model_status": "cpt_informed_alabama_one_factor_sensitivity",
+  "output": {
+    "terrain_frame_time_s": 0.0005,
+    "terrain_progress_every_n_frames": 10,
+    "terrain_write_every_n_frames": 100,
+    "wheel_frame_time_s": 0.001,
+    "wheel_progress_every_n_frames": 50,
+    "wheel_write_every_n_frames": 50,
+    "write_contact_forces": true,
+    "write_terrain_settling_motion": false,
+    "write_wheel_mesh_motion": true,
+    "write_wheel_terrain_motion": true
+  },
+  "physical_reference": {
+    "comparison_condition": "UCF RIDER Alabama wheel 10 kg-equivalent, 0.1 m/s, approximately 9.4% median slip",
+    "reference_json": "physical_references/alabama_rider_2026-08-04.json"
+  },
+  "purpose": "Measure local DEM sensitivity around the frozen CPT and Alabama calibration. Only the declared terrain field changes from the baseline, and laps 6-10 remain held out from calibration.",
+  "schema_version": 1,
+  "sequence_condition": {
+    "campaign_scenario": "particle_mu0p4",
+    "frozen_soil_parameters_from": {
+      "density_gate_status": "PASS_DENSITY",
+      "post_release_bulk_density_kg_m3": 1654.2078782100054,
+      "q100_ratio_predicted_to_observed": 0.970104009174288,
+      "ranking_file": "/Users/erikfranks/Documents/Codex/2026-07-02/get/work/grasp/dem/DEM-Cislune-ProjectChrono/results/cpt/cpt_calibration_rank.json",
+      "ranking_sha256": "7bb9860444958eaaf9b142b57ad2ea7d65d86a462f5e54633e5c4ad6abcf73bf",
+      "resolution_transfer": {
+        "absolute_prediction_status": "WITHHELD_PENDING_CONVERGENCE_AND_PHYSICAL_VALIDATION",
+        "cpt_particle_radius_m": 0.002,
+        "wheel_particle_radius_m": 0.004
+      },
+      "selected_case_id": "cpt-out-track-e3p8-mu50-rr10-c0-r2mm-shared-bed",
+      "selection_score": 0.9436059348696786
+    },
+    "frozen_wheel_friction": 0.9,
+    "lap": 7,
+    "measured_median_active_load_kg_reported": 7.62,
+    "measured_median_carriage_speed_m_s": 0.09799999999997955,
+    "measured_median_slip": 0.10435927902156517,
+    "measured_raw_median_abs_torque_nm": 3.36,
+    "measured_steady_tare_corrected_median_abs_torque_nm": 0.7650000000000001,
+    "measured_tare_corrected_median_abs_torque_nm": 0.96,
+    "one_factor_at_a_time": true,
+    "prior_case_id": "alabama-rider-sequence-mu0p9-lap06",
+    "qualification": "Local sensitivity on one frozen 8 mm bed geometry. Soil-property variants are not independent CPT recalibrations and must not replace the CPT-selected baseline.",
+    "sensitivity_overrides": {
+      "particle_friction": 0.4
+    },
+    "sequence": "UCF Alabama RIDER 2026-08-04",
+    "shared_bed_case_id": "wheel-shared-bed-r8mm-cpt-informed-process-dt5us-margin0p18",
+    "shared_bed_state_sha256": "f43125a9acd2e84d84633b794e8c3a25498fee1cd8c74b05ddd64476e108a7ff",
+    "source_reference": "physical_references/alabama_rider_2026-08-04.json",
+    "source_reference_sha256": "d608a45c0c535c9cf44f25fabff716c8feb1aa97ab927ac9b69a1fd9afb77a16",
+    "split": "held_out_validation",
+    "torque_qualification": "Direction-conditioned loaded-stationary baseline correction; residual includes dynamic rig losses and is an upper bound on wheel-soil torque."
+  },
+  "shared_sample_preparation": {
+    "achieved_to_target_ratio": 0.8049416440954134,
+    "post_release_bulk_density_kg_m3": 1370.9852956027285,
+    "random_seed": 77,
+    "source_preparation_path": "case:wheel-shared-bed-r8mm-cpt-informed-process-dt5us-margin0p18/terrain/terrain_preparation.json",
+    "source_preparation_sha256": "eb71c681ff03e40ea76d2fc7e4286453f76aa6eaaf07f5e28004d98f9d6a3050",
+    "target_bulk_density_kg_m3": 1703.2107925580497
+  },
+  "solver": {
+    "error_out_avg_contacts": 500.0,
+    "error_out_velocity_m_s": 30.0,
+    "max_triangles_in_bin": 100000,
+    "max_velocity_m_s": 20.0
+  },
+  "terrain": {
+    "base_particle_radius_m": 0.008,
+    "bed_depth_m": 0.105,
+    "bin_travel_length_m": 0.64,
+    "bin_width_m": 0.2,
+    "calibration_status": "CPT-selected material parameters transferred to a deliberately coarse runtime checkout; no absolute prediction permitted",
+    "coefficient_of_restitution": 0.3,
+    "cohesion": 0.0,
+    "compression_frame_time_s": 0.0005,
+    "compression_max_time_s": 1.5,
+    "compression_release_margin": 0.18,
+    "compression_speed_m_s": 0.1,
+    "initial_fill_height_m": 0.085,
+    "initial_solid_fraction": 0.55,
+    "initial_state_case_id": "alabama-sensitivity-particle_mu0p4-lap06",
+    "initial_state_relative_path": "wheel/slip_0.115665/pass_01/Trial 1/Slip 0.115665/settled data/slip_sinkage_settled_data_slip_0.115665.csv",
+    "name": "bounded-cpt-informed-process-checkout",
+    "particle_density_kg_m3": 2750.0,
+    "particle_friction": 0.4,
+    "poissons_ratio": 0.3,
+    "post_compression_relax_s": 0.05,
+    "random_seed": 77,
+    "rolling_resistance": 0.1,
+    "settle_time_s": 0.4,
+    "target_bulk_density_kg_m3": 1703.2107925580497,
+    "target_settled_bed_height_m": 0.075,
+    "time_step_s": 5e-06,
+    "wheel_cohesion": 0.0,
+    "wheel_friction": 0.9,
+    "wheel_restitution": 0.2,
+    "youngs_modulus_pa": 300000000.0
+  },
+  "test": {
+    "duration_s": 1.2,
+    "gravity_m_s2": 9.81,
+    "kinematics_mode": "fixed_linear_speed",
+    "linear_speed_m_s": 0.09799999999997955,
+    "normal_load_n": 74.72667299999999,
+    "passes": 1,
+    "slip_ratios": [
+      0.10435927902156517
+    ]
+  },
+  "wheel": {
+    "design_obj": "reference wheel+plate meshes/alabamawheel.obj",
+    "dimension_tolerance_fraction": 0.015,
+    "effective_mass_kg": 10.0,
+    "envelope_radius_m": 0.204,
+    "feature_height_in_particle_radii": 3.5,
+    "feature_height_m": 0.014,
+    "obj": "collision_meshes/alabamawheel_collision_2mm.obj",
+    "obj_units": "m",
+    "role": "Current physical UCF Alabama reference",
+    "rolling_radius_m": 0.19,
+    "source_axes": {
+      "axle": "+y",
+      "travel": "+x",
+      "up": "+z"
+    },
+    "width_m": 0.101852
+  }
+}

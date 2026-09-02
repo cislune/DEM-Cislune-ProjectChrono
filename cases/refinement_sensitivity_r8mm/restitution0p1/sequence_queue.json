@@ -1,0 +1,22 @@
+{
+  "calibration_split": "laps 1-5",
+  "campaign_scenario": "restitution0p1",
+  "held_out_validation_split": "laps 6-10",
+  "manifests": [
+    "cases/refinement_sensitivity_r8mm/restitution0p1/alabama-sensitivity-restitution0p1-lap01.json",
+    "cases/refinement_sensitivity_r8mm/restitution0p1/alabama-sensitivity-restitution0p1-lap02.json",
+    "cases/refinement_sensitivity_r8mm/restitution0p1/alabama-sensitivity-restitution0p1-lap03.json",
+    "cases/refinement_sensitivity_r8mm/restitution0p1/alabama-sensitivity-restitution0p1-lap04.json",
+    "cases/refinement_sensitivity_r8mm/restitution0p1/alabama-sensitivity-restitution0p1-lap05.json",
+    "cases/refinement_sensitivity_r8mm/restitution0p1/alabama-sensitivity-restitution0p1-lap06.json",
+    "cases/refinement_sensitivity_r8mm/restitution0p1/alabama-sensitivity-restitution0p1-lap07.json",
+    "cases/refinement_sensitivity_r8mm/restitution0p1/alabama-sensitivity-restitution0p1-lap08.json",
+    "cases/refinement_sensitivity_r8mm/restitution0p1/alabama-sensitivity-restitution0p1-lap09.json",
+    "cases/refinement_sensitivity_r8mm/restitution0p1/alabama-sensitivity-restitution0p1-lap10.json"
+  ],
+  "schema_version": 1,
+  "sensitivity_overrides": {
+    "coefficient_of_restitution": 0.1
+  },
+  "state_transfer": "each lap imports the preceding lap final soil state"
+}

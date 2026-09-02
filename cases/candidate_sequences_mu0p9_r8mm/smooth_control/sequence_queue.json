@@ -1,0 +1,17 @@
+{
+  "candidate": "smooth_control",
+  "manifests": [
+    "cases/candidate_sequences_mu0p9_r8mm/smooth_control/candidate-sequence-smooth_control-lap01.json",
+    "cases/candidate_sequences_mu0p9_r8mm/smooth_control/candidate-sequence-smooth_control-lap02.json",
+    "cases/candidate_sequences_mu0p9_r8mm/smooth_control/candidate-sequence-smooth_control-lap03.json",
+    "cases/candidate_sequences_mu0p9_r8mm/smooth_control/candidate-sequence-smooth_control-lap04.json",
+    "cases/candidate_sequences_mu0p9_r8mm/smooth_control/candidate-sequence-smooth_control-lap05.json",
+    "cases/candidate_sequences_mu0p9_r8mm/smooth_control/candidate-sequence-smooth_control-lap06.json",
+    "cases/candidate_sequences_mu0p9_r8mm/smooth_control/candidate-sequence-smooth_control-lap07.json",
+    "cases/candidate_sequences_mu0p9_r8mm/smooth_control/candidate-sequence-smooth_control-lap08.json",
+    "cases/candidate_sequences_mu0p9_r8mm/smooth_control/candidate-sequence-smooth_control-lap09.json",
+    "cases/candidate_sequences_mu0p9_r8mm/smooth_control/candidate-sequence-smooth_control-lap10.json"
+  ],
+  "schema_version": 1,
+  "state_transfer": "each lap imports the preceding lap final soil state"
+}

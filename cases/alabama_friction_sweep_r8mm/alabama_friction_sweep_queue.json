@@ -1,0 +1,12 @@
+{
+  "calibration_split": "Alabama RIDER laps 1-5",
+  "fitted_parameter": "terrain.wheel_friction",
+  "held_out_split": "Alabama RIDER laps 6-10",
+  "manifests": [
+    "cases/alabama_friction_sweep_r8mm/calibrate-alabama-wheel-friction-mu0p3.json",
+    "cases/alabama_friction_sweep_r8mm/calibrate-alabama-wheel-friction-mu0p5.json",
+    "cases/alabama_friction_sweep_r8mm/calibrate-alabama-wheel-friction-mu0p7.json",
+    "cases/alabama_friction_sweep_r8mm/calibrate-alabama-wheel-friction-mu0p9.json"
+  ],
+  "schema_version": 1
+}

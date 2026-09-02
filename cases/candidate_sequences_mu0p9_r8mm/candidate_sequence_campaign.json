@@ -1,0 +1,13 @@
+{
+  "campaign": "Printable candidate repeated-traffic screen",
+  "candidate_queues": [
+    "cases/candidate_sequences_mu0p9_r8mm/smooth_control/sequence_queue.json",
+    "cases/candidate_sequences_mu0p9_r8mm/broad_wave_12/sequence_queue.json",
+    "cases/candidate_sequences_mu0p9_r8mm/chevron_wave_14/sequence_queue.json",
+    "cases/candidate_sequences_mu0p9_r8mm/low_grouser_16/sequence_queue.json",
+    "cases/candidate_sequences_mu0p9_r8mm/low_grouser_16_10mm/sequence_queue.json",
+    "cases/candidate_sequences_mu0p9_r8mm/staggered_wave_12/sequence_queue.json"
+  ],
+  "comparison": "Normalize cumulative and mobility metrics to smooth_control.",
+  "schema_version": 1
+}

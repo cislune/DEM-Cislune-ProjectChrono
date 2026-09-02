@@ -1,0 +1,12 @@
+{
+  "manifests": [
+    "cases/density_margin_r4mm_cd1/density-r4mm-margin0p18-cub-fixed-bin-cd1.json",
+    "cases/density_margin_r4mm_cd1/density-r4mm-margin0p35-cub-fixed-bin-cd1.json",
+    "cases/density_margin_r4mm_cd1/density-r4mm-margin0p55-cub-fixed-bin-cd1.json"
+  ],
+  "purpose": "Select a post-release density margin under the deterministic CD1 solver before finer full-wheel validation.",
+  "schema_version": 1,
+  "solver_profile": "cub-fixed-bin-cd1",
+  "source_manifest": "cases/wheel_density_particle_scale_sweep/wheel-density-coupon-r4mm-dt2p5us-l200mm.json",
+  "source_manifest_sha256": "17328da436549def90ab527072736a8628f89ee8d875c06e289f084bc122dc10"
+}

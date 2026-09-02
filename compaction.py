@@ -3,8 +3,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import pyvista as pv
 import config as c
+from vtk_points import read_ascii_vtk_point_centroid
 
 #----------------------------------------------------------------------------------------------------------------------------
 # PATHS (define project root, locate simulation outputs, and prepare output directories for compaction post-processing)
@@ -14,7 +14,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 # absolute path to the directory containing this compaction script
 # used as the root reference so that all other project paths remain relative and portable
 
-OUTPUT_ROOT = PROJECT_ROOT / "DEM-Calibration-Project-Chrono"
+OUTPUT_ROOT = Path(getattr(c, "COMPACTION_OUT_DIR", PROJECT_ROOT / "DEM-Calibration-Project-Chrono"))
 OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 # directory where all post-processing outputs from this script will be written
 # includes per-slip overlay maps, aggregated CSVs, and cross-slip comparison outputs
@@ -40,7 +40,7 @@ SLIP_WHEEL_MOTION_SUBDIR = getattr(c, "SLIP_SINKAGE_WHEEL_MOTION_SUBDIR", "wheel
 # subdirectory names inside each slip case folder
 # FIXED: slip-sinkage outputs are nested under Trial X / Slip Y / {terrain motion, wheel motion, ...}
 
-WHEEL_LABEL = "TREAD Coupon Wheel"
+WHEEL_LABEL = getattr(c, "WHEEL_LABEL_st", "TREAD Coupon Wheel")
 # descriptive label used in plot titles, legends, and summary file names
 
 
@@ -330,16 +330,9 @@ def read_wheel_center_from_vtk(path: Path):
         return None
 
     try:
-        mesh = pv.read(path)
-        # read the VTK wheel mesh using PyVista
-
-        if mesh.points is None or len(mesh.points) == 0:
-            # empty mesh -> cannot infer wheel center
-            return None
-
-        # approximate wheel center as the centroid of all wheel-mesh vertices
-        # sufficient for overlaying wheel path on compaction maps
-        return np.asarray(mesh.points, dtype=float).mean(axis=0)
+        # DEME writes legacy ASCII VTK. Reading only the POINTS block avoids
+        # loading the native VTK/PyVista stack during lightweight analysis.
+        return read_ascii_vtk_point_centroid(path)
 
     except Exception:
         # fail gracefully if a VTK file cannot be read

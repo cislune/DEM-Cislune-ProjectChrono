@@ -1,0 +1,23 @@
+{
+  "campaign": "same-bed numerical repeatability",
+  "candidates": [
+    "smooth_control",
+    "broad_wave_12",
+    "chevron_wave_14"
+  ],
+  "manifests": [
+    "cases/wheel_repeatability_r8mm/repeatability-smooth_control-r01.json",
+    "cases/wheel_repeatability_r8mm/repeatability-smooth_control-r02.json",
+    "cases/wheel_repeatability_r8mm/repeatability-smooth_control-r03.json",
+    "cases/wheel_repeatability_r8mm/repeatability-broad_wave_12-r01.json",
+    "cases/wheel_repeatability_r8mm/repeatability-broad_wave_12-r02.json",
+    "cases/wheel_repeatability_r8mm/repeatability-broad_wave_12-r03.json",
+    "cases/wheel_repeatability_r8mm/repeatability-chevron_wave_14-r01.json",
+    "cases/wheel_repeatability_r8mm/repeatability-chevron_wave_14-r02.json",
+    "cases/wheel_repeatability_r8mm/repeatability-chevron_wave_14-r03.json"
+  ],
+  "replicates_per_candidate": 3,
+  "schema_version": 1,
+  "shared_bed_case_id": "wheel-shared-bed-r8mm-cpt-informed-process-dt5us-margin0p18",
+  "shared_bed_state_sha256": "f43125a9acd2e84d84633b794e8c3a25498fee1cd8c74b05ddd64476e108a7ff"
+}

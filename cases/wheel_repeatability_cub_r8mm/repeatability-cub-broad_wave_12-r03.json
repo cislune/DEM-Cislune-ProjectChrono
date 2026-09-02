@@ -1,0 +1,121 @@
+{
+  "analysis": {
+    "density_gate_affects_status": false,
+    "minimum_lane_particles": 5
+  },
+  "case_id": "repeatability-cub-broad_wave_12-r03",
+  "frozen_screen_provenance": {
+    "candidate": "broad_wave_12",
+    "qualification": "The 8 mm bed fails the physical density gate. Use normalized candidate comparisons only; withhold absolute compaction prediction.",
+    "shared_bed_case_id": "wheel-shared-bed-r8mm-cpt-informed-process-dt5us-margin0p18",
+    "shared_bed_state_sha256": "f43125a9acd2e84d84633b794e8c3a25498fee1cd8c74b05ddd64476e108a7ff",
+    "soil_parameters_selected_from": "UCF Alabama out-track CPT",
+    "wheel_friction": 0.9,
+    "wheel_friction_selected_from": "UCF Alabama RIDER laps 1-5"
+  },
+  "model_status": "same_bed_numerical_repeatability_check",
+  "output": {
+    "terrain_frame_time_s": 0.0005,
+    "terrain_progress_every_n_frames": 10,
+    "terrain_write_every_n_frames": 100,
+    "wheel_frame_time_s": 0.001,
+    "wheel_progress_every_n_frames": 50,
+    "wheel_write_every_n_frames": 50,
+    "write_contact_forces": true,
+    "write_terrain_settling_motion": false,
+    "write_wheel_mesh_motion": true,
+    "write_wheel_terrain_motion": true
+  },
+  "purpose": "Quantify run-to-run DEM variability while holding the manifest physics, wheel geometry, and settled terrain realization fixed.",
+  "repeatability_target": {
+    "candidate": "broad_wave_12",
+    "execution_profile": "repeatability-cub",
+    "qualification": "This campaign measures numerical repeatability on one fixed coarse bed; it does not measure uncertainty across physical bed preparations.",
+    "replicate": 3,
+    "replicates_requested": 3,
+    "shared_bed_case_id": "wheel-shared-bed-r8mm-cpt-informed-process-dt5us-margin0p18",
+    "shared_bed_state_sha256": "f43125a9acd2e84d84633b794e8c3a25498fee1cd8c74b05ddd64476e108a7ff",
+    "solver_overrides": {
+      "sort_contact_pairs": true,
+      "use_cub_force_collection": true
+    },
+    "source_manifest": "cases/frozen_candidate_screen_mu0p9_r8mm/screen-frozen-broad_wave_12-r8mm.json",
+    "source_manifest_sha256": "220f4224202ea28ff2a48684df695920fc60dc0f9dd8be63dea8708a91148278"
+  },
+  "schema_version": 1,
+  "shared_sample_preparation": {
+    "achieved_to_target_ratio": 0.8049416440954134,
+    "post_release_bulk_density_kg_m3": 1370.9852956027285,
+    "random_seed": 77,
+    "source_preparation_path": "case:wheel-shared-bed-r8mm-cpt-informed-process-dt5us-margin0p18/terrain/terrain_preparation.json",
+    "source_preparation_sha256": "eb71c681ff03e40ea76d2fc7e4286453f76aa6eaaf07f5e28004d98f9d6a3050",
+    "target_bulk_density_kg_m3": 1703.2107925580497
+  },
+  "solver": {
+    "error_out_avg_contacts": 500.0,
+    "error_out_velocity_m_s": 30.0,
+    "max_triangles_in_bin": 100000,
+    "max_velocity_m_s": 20.0,
+    "sort_contact_pairs": true,
+    "use_cub_force_collection": true
+  },
+  "terrain": {
+    "base_particle_radius_m": 0.008,
+    "bed_depth_m": 0.105,
+    "bin_travel_length_m": 0.64,
+    "bin_width_m": 0.2,
+    "calibration_status": "CPT-selected material parameters transferred to a deliberately coarse runtime checkout; no absolute prediction permitted",
+    "coefficient_of_restitution": 0.3,
+    "cohesion": 0.0,
+    "compression_frame_time_s": 0.0005,
+    "compression_max_time_s": 1.5,
+    "compression_release_margin": 0.18,
+    "compression_speed_m_s": 0.1,
+    "initial_fill_height_m": 0.085,
+    "initial_solid_fraction": 0.55,
+    "initial_state_case_id": "wheel-shared-bed-r8mm-cpt-informed-process-dt5us-margin0p18",
+    "initial_state_filename": "settled_terrain_data.csv",
+    "name": "bounded-cpt-informed-process-checkout",
+    "particle_density_kg_m3": 2750.0,
+    "particle_friction": 0.5,
+    "poissons_ratio": 0.3,
+    "post_compression_relax_s": 0.05,
+    "random_seed": 77,
+    "rolling_resistance": 0.1,
+    "settle_time_s": 0.4,
+    "target_bulk_density_kg_m3": 1703.2107925580497,
+    "target_settled_bed_height_m": 0.075,
+    "time_step_s": 5e-06,
+    "wheel_cohesion": 0.0,
+    "wheel_friction": 0.9,
+    "wheel_restitution": 0.2,
+    "youngs_modulus_pa": 300000000.0
+  },
+  "test": {
+    "duration_s": 1.2,
+    "gravity_m_s2": 9.81,
+    "kinematics_mode": "fixed_linear_speed",
+    "linear_speed_m_s": 0.0980000000000074,
+    "normal_load_n": 88.75018250000001,
+    "passes": 1,
+    "slip_ratios": [
+      0.09119069549774234
+    ]
+  },
+  "wheel": {
+    "dimension_tolerance_fraction": 0.01,
+    "effective_mass_kg": 10.0,
+    "envelope_radius_m": 0.198,
+    "feature_height_in_particle_radii": 1.0,
+    "feature_height_m": 0.008,
+    "obj": "wheel_candidates/dem_full_scale/broad_wave_12.obj",
+    "obj_units": "m",
+    "rolling_radius_m": 0.19467860991818764,
+    "source_axes": {
+      "axle": "+y",
+      "travel": "+x",
+      "up": "+z"
+    },
+    "width_m": 0.1016
+  }
+}

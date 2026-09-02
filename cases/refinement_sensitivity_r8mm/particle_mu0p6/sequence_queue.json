@@ -1,0 +1,22 @@
+{
+  "calibration_split": "laps 1-5",
+  "campaign_scenario": "particle_mu0p6",
+  "held_out_validation_split": "laps 6-10",
+  "manifests": [
+    "cases/refinement_sensitivity_r8mm/particle_mu0p6/alabama-sensitivity-particle_mu0p6-lap01.json",
+    "cases/refinement_sensitivity_r8mm/particle_mu0p6/alabama-sensitivity-particle_mu0p6-lap02.json",
+    "cases/refinement_sensitivity_r8mm/particle_mu0p6/alabama-sensitivity-particle_mu0p6-lap03.json",
+    "cases/refinement_sensitivity_r8mm/particle_mu0p6/alabama-sensitivity-particle_mu0p6-lap04.json",
+    "cases/refinement_sensitivity_r8mm/particle_mu0p6/alabama-sensitivity-particle_mu0p6-lap05.json",
+    "cases/refinement_sensitivity_r8mm/particle_mu0p6/alabama-sensitivity-particle_mu0p6-lap06.json",
+    "cases/refinement_sensitivity_r8mm/particle_mu0p6/alabama-sensitivity-particle_mu0p6-lap07.json",
+    "cases/refinement_sensitivity_r8mm/particle_mu0p6/alabama-sensitivity-particle_mu0p6-lap08.json",
+    "cases/refinement_sensitivity_r8mm/particle_mu0p6/alabama-sensitivity-particle_mu0p6-lap09.json",
+    "cases/refinement_sensitivity_r8mm/particle_mu0p6/alabama-sensitivity-particle_mu0p6-lap10.json"
+  ],
+  "schema_version": 1,
+  "sensitivity_overrides": {
+    "particle_friction": 0.6
+  },
+  "state_transfer": "each lap imports the preceding lap final soil state"
+}

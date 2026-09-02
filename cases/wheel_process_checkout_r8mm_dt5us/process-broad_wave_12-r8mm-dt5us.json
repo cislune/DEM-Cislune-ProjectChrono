@@ -1,0 +1,85 @@
+{
+  "analysis": {
+    "density_gate_affects_status": false,
+    "minimum_lane_particles": 5
+  },
+  "case_id": "process-broad_wave_12-r8mm-dt5us",
+  "model_status": "software_process_checkout",
+  "output": {
+    "terrain_frame_time_s": 0.0005,
+    "terrain_progress_every_n_frames": 10,
+    "terrain_write_every_n_frames": 100,
+    "wheel_frame_time_s": 0.001,
+    "wheel_progress_every_n_frames": 10,
+    "wheel_write_every_n_frames": 10,
+    "write_contact_forces": true,
+    "write_terrain_settling_motion": false,
+    "write_wheel_mesh_motion": true,
+    "write_wheel_terrain_motion": true
+  },
+  "purpose": "Bounded checkout of terrain preparation, wheel OBJ import, prescribed motion, contact output, compaction analysis, and ranking. Runtime and integrity are the acceptance criteria; results are not physically interpreted.",
+  "schema_version": 1,
+  "solver": {
+    "error_out_avg_contacts": 500.0,
+    "error_out_velocity_m_s": 30.0,
+    "max_triangles_in_bin": 100000,
+    "max_velocity_m_s": 20.0
+  },
+  "terrain": {
+    "base_particle_radius_m": 0.008,
+    "bed_depth_m": 0.105,
+    "bin_travel_length_m": 0.52,
+    "bin_width_m": 0.2,
+    "calibration_status": "CPT-selected material parameters transferred to a deliberately coarse runtime checkout; no absolute prediction permitted",
+    "coefficient_of_restitution": 0.3,
+    "cohesion": 0.0,
+    "compression_frame_time_s": 0.0005,
+    "compression_max_time_s": 1.5,
+    "compression_release_margin": 0.18,
+    "compression_speed_m_s": 0.1,
+    "initial_fill_height_m": 0.085,
+    "initial_solid_fraction": 0.55,
+    "name": "bounded-cpt-informed-process-checkout",
+    "particle_density_kg_m3": 2750.0,
+    "particle_friction": 0.5,
+    "poissons_ratio": 0.3,
+    "post_compression_relax_s": 0.05,
+    "random_seed": 77,
+    "rolling_resistance": 0.1,
+    "settle_time_s": 0.4,
+    "target_bulk_density_kg_m3": 1703.2107925580497,
+    "target_settled_bed_height_m": 0.075,
+    "time_step_s": 5e-06,
+    "wheel_cohesion": 0.0,
+    "wheel_friction": 0.6,
+    "wheel_restitution": 0.2,
+    "youngs_modulus_pa": 300000000.0
+  },
+  "test": {
+    "duration_s": 0.08,
+    "gravity_m_s2": 9.81,
+    "kinematics_mode": "fixed_linear_speed",
+    "linear_speed_m_s": 0.1,
+    "normal_load_n": 98.1,
+    "passes": 1,
+    "slip_ratios": [
+      0.09396784087753285
+    ]
+  },
+  "wheel": {
+    "dimension_tolerance_fraction": 0.01,
+    "effective_mass_kg": 10.0,
+    "envelope_radius_m": 0.198,
+    "feature_height_in_particle_radii": 1.0,
+    "feature_height_m": 0.008,
+    "obj": "wheel_candidates/dem_full_scale/broad_wave_12.obj",
+    "obj_units": "m",
+    "rolling_radius_m": 0.19467860991818764,
+    "source_axes": {
+      "axle": "+y",
+      "travel": "+x",
+      "up": "+z"
+    },
+    "width_m": 0.1016
+  }
+}

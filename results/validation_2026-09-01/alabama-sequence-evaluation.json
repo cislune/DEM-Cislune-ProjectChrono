@@ -1,0 +1,192 @@
+{
+  "compaction": {
+    "observed_in_to_out_bulk_density_ratio": 1.1403051895871694,
+    "observed_in_to_out_q100_ratio": 7.734322319622387,
+    "qualification": "The DEM value is a chained lane-height proxy, not a simulated CPT result. The 8 mm bed density gate fails, and the physical CPT samples are spatial post-traffic contrasts. Use this comparison for direction and scale only.",
+    "simulated_cumulative_column_density_ratio_proxy": 1.2783671186487653
+  },
+  "completed_laps": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "interpretation": "Physical torque is corrected by a same-lap, same-direction loaded-stationary baseline but still contains dynamic rig losses, so it is an upper bound on wheel-soil contact torque. Laps 6-10 are held out from friction selection.",
+  "laps": [
+    {
+      "absolute_error_nm": 0.2805434532107347,
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "incremental_column_strain_proxy": 0.09619429806077624,
+      "incremental_density_ratio_proxy": 1.106432497443178,
+      "lap": 1,
+      "observed_corrected_torque_upper_bound_nm": 0.9300000000000002,
+      "predicted_contact_torque_nm": 0.6494565467892655,
+      "predicted_to_observed_ratio": 0.6983403728916832,
+      "relative_error": 0.30165962710831684,
+      "result_json": "/home/c3630/grasp-dem-runs/alabama-rider-sequence-mu0p9-20260901/alabama-rider-sequence-mu0p9-lap01/wheel_performance.json",
+      "result_status": "PASS_COMPARATIVE_METRICS",
+      "split": "calibration"
+    },
+    {
+      "absolute_error_nm": 0.0426604189130082,
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "incremental_column_strain_proxy": 0.03438137938389896,
+      "incremental_density_ratio_proxy": 1.0356055472107222,
+      "lap": 2,
+      "observed_corrected_torque_upper_bound_nm": 0.8699999999999999,
+      "predicted_contact_torque_nm": 0.9126604189130081,
+      "predicted_to_observed_ratio": 1.0490349642678256,
+      "relative_error": 0.049034964267825526,
+      "result_json": "/home/c3630/grasp-dem-runs/alabama-rider-sequence-mu0p9-20260901/alabama-rider-sequence-mu0p9-lap02/wheel_performance.json",
+      "result_status": "PASS_COMPARATIVE_METRICS",
+      "split": "calibration"
+    },
+    {
+      "absolute_error_nm": 0.1130434327034765,
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "incremental_column_strain_proxy": 0.011917661658234229,
+      "incremental_density_ratio_proxy": 1.0120614054069976,
+      "lap": 3,
+      "observed_corrected_torque_upper_bound_nm": 0.8249999999999997,
+      "predicted_contact_torque_nm": 0.9380434327034762,
+      "predicted_to_observed_ratio": 1.1370223426708808,
+      "relative_error": 0.13702234267088065,
+      "result_json": "/home/c3630/grasp-dem-runs/alabama-rider-sequence-mu0p9-20260901/alabama-rider-sequence-mu0p9-lap03/wheel_performance.json",
+      "result_status": "PASS_COMPARATIVE_METRICS",
+      "split": "calibration"
+    },
+    {
+      "absolute_error_nm": 0.061567410639906006,
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "incremental_column_strain_proxy": 0.028762888788814774,
+      "incremental_density_ratio_proxy": 1.029614692907426,
+      "lap": 4,
+      "observed_corrected_torque_upper_bound_nm": 1.0700000000000003,
+      "predicted_contact_torque_nm": 1.1315674106399063,
+      "predicted_to_observed_ratio": 1.0575396361120617,
+      "relative_error": 0.05753963611206167,
+      "result_json": "/home/c3630/grasp-dem-runs/alabama-rider-sequence-mu0p9-20260901/alabama-rider-sequence-mu0p9-lap04/wheel_performance.json",
+      "result_status": "PASS_COMPARATIVE_METRICS",
+      "split": "calibration"
+    },
+    {
+      "absolute_error_nm": 0.24091303383102347,
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "incremental_column_strain_proxy": -0.01847231763530822,
+      "incremental_density_ratio_proxy": 0.9818627199625833,
+      "lap": 5,
+      "observed_corrected_torque_upper_bound_nm": 0.8800000000000001,
+      "predicted_contact_torque_nm": 0.6390869661689766,
+      "predicted_to_observed_ratio": 0.7262351888283824,
+      "relative_error": 0.27376481117161755,
+      "result_json": "/home/c3630/grasp-dem-runs/alabama-rider-sequence-mu0p9-20260901/alabama-rider-sequence-mu0p9-lap05/wheel_performance.json",
+      "result_status": "PASS_COMPARATIVE_METRICS",
+      "split": "calibration"
+    },
+    {
+      "absolute_error_nm": 0.1342586729080013,
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "incremental_column_strain_proxy": 0.03790388266788568,
+      "incremental_density_ratio_proxy": 1.039397189101015,
+      "lap": 6,
+      "observed_corrected_torque_upper_bound_nm": 0.7699999999999998,
+      "predicted_contact_torque_nm": 0.9042586729080011,
+      "predicted_to_observed_ratio": 1.1743619128675342,
+      "relative_error": 0.17436191286753422,
+      "result_json": "/home/c3630/grasp-dem-runs/alabama-rider-sequence-mu0p9-20260901/alabama-rider-sequence-mu0p9-lap06/wheel_performance.json",
+      "result_status": "PASS_COMPARATIVE_METRICS",
+      "split": "held_out_validation"
+    },
+    {
+      "absolute_error_nm": 0.06007465190955952,
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "incremental_column_strain_proxy": -0.01778390260682171,
+      "incremental_density_ratio_proxy": 0.9825268383973531,
+      "lap": 7,
+      "observed_corrected_torque_upper_bound_nm": 0.96,
+      "predicted_contact_torque_nm": 0.8999253480904404,
+      "predicted_to_observed_ratio": 0.9374222375942088,
+      "relative_error": 0.06257776240579117,
+      "result_json": "/home/c3630/grasp-dem-runs/alabama-rider-sequence-mu0p9-20260901/alabama-rider-sequence-mu0p9-lap07/wheel_performance.json",
+      "result_status": "PASS_COMPARATIVE_METRICS",
+      "split": "held_out_validation"
+    },
+    {
+      "absolute_error_nm": 0.057836635799185854,
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "incremental_column_strain_proxy": 0.0332917970707701,
+      "incremental_density_ratio_proxy": 1.0344383103090389,
+      "lap": 8,
+      "observed_corrected_torque_upper_bound_nm": 0.8700000000000001,
+      "predicted_contact_torque_nm": 0.927836635799186,
+      "predicted_to_observed_ratio": 1.0664788917232022,
+      "relative_error": 0.06647889172320212,
+      "result_json": "/home/c3630/grasp-dem-runs/alabama-rider-sequence-mu0p9-20260901/alabama-rider-sequence-mu0p9-lap08/wheel_performance.json",
+      "result_status": "PASS_COMPARATIVE_METRICS",
+      "split": "held_out_validation"
+    },
+    {
+      "absolute_error_nm": 0.15457569961587714,
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "incremental_column_strain_proxy": 0.027855014521088364,
+      "incremental_density_ratio_proxy": 1.0286531483854398,
+      "lap": 9,
+      "observed_corrected_torque_upper_bound_nm": 1.25,
+      "predicted_contact_torque_nm": 1.0954243003841229,
+      "predicted_to_observed_ratio": 0.8763394403072983,
+      "relative_error": 0.1236605596927017,
+      "result_json": "/home/c3630/grasp-dem-runs/alabama-rider-sequence-mu0p9-20260901/alabama-rider-sequence-mu0p9-lap09/wheel_performance.json",
+      "result_status": "PASS_COMPARATIVE_METRICS",
+      "split": "held_out_validation"
+    },
+    {
+      "absolute_error_nm": 1.743488547652386,
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "incremental_column_strain_proxy": 0.0034580585387761573,
+      "incremental_density_ratio_proxy": 1.0034700582031757,
+      "lap": 10,
+      "observed_corrected_torque_upper_bound_nm": 1.1300000000000001,
+      "predicted_contact_torque_nm": 2.873488547652386,
+      "predicted_to_observed_ratio": 2.5429102191614033,
+      "relative_error": 1.5429102191614035,
+      "result_json": "/home/c3630/grasp-dem-runs/alabama-rider-sequence-mu0p9-20260901/alabama-rider-sequence-mu0p9-lap10/wheel_performance.json",
+      "result_status": "PASS_COMPARATIVE_METRICS",
+      "split": "held_out_validation"
+    }
+  ],
+  "schema_version": 1,
+  "status": "COMPLETE_PASS_MEDIAN_WITH_OUTLIER_DENSITY_MISMATCH",
+  "summaries": {
+    "calibration": {
+      "completed_laps": 5,
+      "laps_within_20_percent_fraction": 0.6,
+      "maximum_lap_relative_error": 0.30165962710831684,
+      "median_lap_relative_error": 0.13702234267088065,
+      "median_observed_corrected_torque_upper_bound_nm": 0.8800000000000001,
+      "median_predicted_contact_torque_nm": 0.9126604189130081,
+      "outlier_laps_over_50_percent": [],
+      "predicted_to_observed_ratio": 1.0371141124011454,
+      "relative_error": 0.03711411240114542
+    },
+    "held_out_validation": {
+      "completed_laps": 5,
+      "laps_within_20_percent_fraction": 0.8,
+      "maximum_lap_relative_error": 1.5429102191614035,
+      "median_lap_relative_error": 0.1236605596927017,
+      "median_observed_corrected_torque_upper_bound_nm": 0.96,
+      "median_predicted_contact_torque_nm": 0.927836635799186,
+      "outlier_laps_over_50_percent": [
+        10
+      ],
+      "predicted_to_observed_ratio": 0.9664964956241521,
+      "relative_error": 0.033503504375847926
+    }
+  },
+  "torque_validation_status": "PASS_MEDIAN_WITH_OUTLIER"
+}

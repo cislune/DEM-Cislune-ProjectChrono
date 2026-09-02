@@ -1,0 +1,17 @@
+{
+  "candidate": "broad_wave_12",
+  "manifests": [
+    "cases/candidate_sequences_mu0p9_r8mm/broad_wave_12/candidate-sequence-broad_wave_12-lap01.json",
+    "cases/candidate_sequences_mu0p9_r8mm/broad_wave_12/candidate-sequence-broad_wave_12-lap02.json",
+    "cases/candidate_sequences_mu0p9_r8mm/broad_wave_12/candidate-sequence-broad_wave_12-lap03.json",
+    "cases/candidate_sequences_mu0p9_r8mm/broad_wave_12/candidate-sequence-broad_wave_12-lap04.json",
+    "cases/candidate_sequences_mu0p9_r8mm/broad_wave_12/candidate-sequence-broad_wave_12-lap05.json",
+    "cases/candidate_sequences_mu0p9_r8mm/broad_wave_12/candidate-sequence-broad_wave_12-lap06.json",
+    "cases/candidate_sequences_mu0p9_r8mm/broad_wave_12/candidate-sequence-broad_wave_12-lap07.json",
+    "cases/candidate_sequences_mu0p9_r8mm/broad_wave_12/candidate-sequence-broad_wave_12-lap08.json",
+    "cases/candidate_sequences_mu0p9_r8mm/broad_wave_12/candidate-sequence-broad_wave_12-lap09.json",
+    "cases/candidate_sequences_mu0p9_r8mm/broad_wave_12/candidate-sequence-broad_wave_12-lap10.json"
+  ],
+  "schema_version": 1,
+  "state_transfer": "each lap imports the preceding lap final soil state"
+}

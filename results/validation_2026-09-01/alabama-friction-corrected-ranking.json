@@ -1,0 +1,32 @@
+[
+  {
+    "absolute_torque_error_nm": 0.042596465450509324,
+    "achieved_to_target_density_ratio": 0.8049416440954134,
+    "case_id": "calibrate-alabama-wheel-friction-mu0p3",
+    "density_gate_status": "REJECT_DENSITY_MISMATCH",
+    "predicted_median_abs_torque_nm": 0.9225964654505094,
+    "relative_torque_error": 0.04840507437557877,
+    "result_json": "/home/c3630/grasp-dem-runs/alabama-rider-calibration-20260901/calibrate-alabama-wheel-friction-mu0p3/wheel_performance.json",
+    "result_status": "PASS_COMPARATIVE_METRICS",
+    "target_median_abs_torque_nm": 0.8800000000000001,
+    "target_metric": "active_tare_corrected_abs_torque_nm.median",
+    "target_reference_sha256": "d608a45c0c535c9cf44f25fabff716c8feb1aa97ab927ac9b69a1fd9afb77a16",
+    "torque_ratio_predicted_to_observed": 1.0484050743755788,
+    "wheel_friction": 0.3
+  },
+  {
+    "absolute_torque_error_nm": 0.27147889178124607,
+    "achieved_to_target_density_ratio": 0.8049416440954134,
+    "case_id": "calibrate-alabama-wheel-friction-mu0p9",
+    "density_gate_status": "REJECT_DENSITY_MISMATCH",
+    "predicted_median_abs_torque_nm": 0.608521108218754,
+    "relative_torque_error": 0.30849874066050686,
+    "result_json": "/home/c3630/grasp-dem-runs/alabama-rider-calibration-20260901/calibrate-alabama-wheel-friction-mu0p9/wheel_performance.json",
+    "result_status": "PASS_COMPARATIVE_METRICS",
+    "target_median_abs_torque_nm": 0.8800000000000001,
+    "target_metric": "active_tare_corrected_abs_torque_nm.median",
+    "target_reference_sha256": "d608a45c0c535c9cf44f25fabff716c8feb1aa97ab927ac9b69a1fd9afb77a16",
+    "torque_ratio_predicted_to_observed": 0.6915012593394931,
+    "wheel_friction": 0.9
+  }
+]

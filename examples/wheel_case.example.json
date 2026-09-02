@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "case_id": "synthetic-smooth-control-checkout",
+  "model_status": "uncalibrated_software_checkout",
+  "purpose": "Exercise the OBJ-to-DEME preflight and frozen-case workflow with synthetic geometry.",
+  "wheel": {
+    "obj": "meshes/synthetic_smooth_control.obj",
+    "obj_units": "m",
+    "source_axes": {
+      "travel": "+x",
+      "axle": "+y",
+      "up": "+z"
+    },
+    "rolling_radius_m": 0.12,
+    "envelope_radius_m": 0.12,
+    "width_m": 0.1,
+    "effective_mass_kg": 12.0,
+    "dimension_tolerance_fraction": 0.02,
+    "mass_model": "Synthetic checkout value; replace with measured rotating mass and applied spindle load."
+  },
+  "test": {
+    "gravity_m_s2": 9.81,
+    "normal_load_n": 120.0,
+    "linear_speed_m_s": 0.1,
+    "kinematics_mode": "fixed_linear_speed",
+    "slip_ratios": [0.1],
+    "duration_s": 2.0,
+    "passes": 1
+  },
+  "terrain": {
+    "name": "synthetic-coarse-checkout-bed",
+    "calibration_status": "not calibrated; software checkout only",
+    "base_particle_radius_m": 0.01,
+    "particle_density_kg_m3": 2500.0,
+    "youngs_modulus_pa": 100000.0,
+    "poissons_ratio": 0.24,
+    "coefficient_of_restitution": 0.3,
+    "particle_friction": 0.3,
+    "rolling_resistance": 0.1,
+    "cohesion": 0.0,
+    "wheel_friction": 0.8,
+    "wheel_restitution": 0.3,
+    "wheel_cohesion": 0.0,
+    "time_step_s": 0.000005,
+    "bin_travel_length_m": 0.7,
+    "bin_width_m": 0.3,
+    "bed_depth_m": 0.15,
+    "initial_fill_height_m": 0.12,
+    "initial_solid_fraction": 0.55,
+    "settle_time_s": 1.0
+  },
+  "solver": {
+    "max_velocity_m_s": 30.0,
+    "error_out_velocity_m_s": 30.0,
+    "max_triangles_in_bin": 100000,
+    "error_out_avg_contacts": 100
+  },
+  "output": {
+    "terrain_frame_time_s": 0.001,
+    "terrain_write_every_n_frames": 100,
+    "write_terrain_settling_motion": false,
+    "wheel_frame_time_s": 0.001,
+    "wheel_write_every_n_frames": 100,
+    "write_wheel_terrain_motion": true,
+    "write_wheel_mesh_motion": true,
+    "write_contact_forces": true
+  }
+}

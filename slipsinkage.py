@@ -1,10 +1,16 @@
 import config as c
+from solver_execution import configure_solver_execution
 import DEME
 from DEME import PDSampler
 import numpy as np
 import random
 import os
+import time
 import pandas as pd
+
+
+def slip_label(value):
+    return f"{float(value):.6f}".rstrip("0").rstrip(".")
 
 # ----------------------------------------------------------------------------------------------------------------------------
 # PREPROCESSING (select wheel/terrain configuration, prepare output directory, define reference kinematics)
@@ -37,7 +43,9 @@ else:
 os.makedirs(c.SLIP_SINKAGE_OUT_DIR, exist_ok=True)
 # create root directory for slip-sinkage outputs
 
-WHEEL_REF_LINEAR_VEL = c.WHEEL_ANG_VEL_st * WHEEL_RAD
+WHEEL_ROLLING_RADIUS = getattr(c, "WHEEL_ROLLING_RADIUS_st", WHEEL_RAD)
+WHEEL_ENVELOPE_RADIUS = getattr(c, "WHEEL_ENVELOPE_RADIUS_st", WHEEL_RAD)
+WHEEL_REF_LINEAR_VEL = c.WHEEL_ANG_VEL_st * WHEEL_ROLLING_RADIUS
 # reference rolling velocity (v = omega * R)
 
 NUM_TRIALS = 1
@@ -76,6 +84,8 @@ for trial_num in range(NUM_TRIALS):
 
         solver = DEME.DEMSolver()
 
+        solver.SetMaxTriangleInBin(int(getattr(c, "MAX_TRIANGLES_IN_BIN_st", 100000)))
+        solver.SetErrorOutAvgContacts(float(getattr(c, "ERROR_OUT_AVG_CONTACTS_st", 100.0)))
         solver.SetVerbosity("INFO")
         solver.SetOutputFormat("CSV")
         solver.SetOutputContent(["XYZ"])
@@ -84,6 +94,7 @@ for trial_num in range(NUM_TRIALS):
         solver.SetErrorOutVelocity(c.ERROR_OUT_VELOCITY_st)
         solver.SetInitTimeStep(c.STEP_SIZE_st)
         solver.SetGravitationalAcceleration(c.GRAVITATIONAL_ACCELERATION_st)
+        configure_solver_execution(solver, c)
 
         # --------------------------------------------------------------------------------------------------------------------
         # MATERIAL + CONTACT MODEL
@@ -123,7 +134,7 @@ for trial_num in range(NUM_TRIALS):
         solver.InstructBoxDomainDimension(
             [-c.WIDTH_st / 2, c.WIDTH_st / 2],
             [-c.LENGTH_st / 2, c.LENGTH_st / 2],
-            [-c.DEPTH_st / 2, c.DEPTH_st / 2 + 10 * WHEEL_RAD],
+            [-c.DEPTH_st / 2, c.DEPTH_st / 2 + 10 * WHEEL_ENVELOPE_RADIUS],
         )
 
         solver.InstructBoxDomainBoundingBC("top_open", mat_type_terrain)
@@ -143,15 +154,22 @@ for trial_num in range(NUM_TRIALS):
         # MOTION PRESCRIPTION + SLIP CONTROL
         # --------------------------------------------------------------------------------------------------------------------
 
-        solver.SetFamilyPrescribedAngVel(1, "0", f"{c.WHEEL_ANG_VEL_st}", "0", False)
+        kinematics_mode = getattr(c, "WHEEL_KINEMATICS_MODE_st", "fixed_angular_speed")
+        if kinematics_mode == "fixed_linear_speed":
+            slip_vel = float(c.WHEEL_LINEAR_VEL_st)
+            wheel_ang_vel = slip_vel / ((1.0 - slip_value) * WHEEL_ROLLING_RADIUS)
+        elif kinematics_mode == "fixed_angular_speed":
+            wheel_ang_vel = float(c.WHEEL_ANG_VEL_st)
+            slip_vel = wheel_ang_vel * WHEEL_ROLLING_RADIUS * (1.0 - slip_value)
+        else:
+            raise ValueError(f"Unknown wheel kinematics mode: {kinematics_mode}")
+
+        solver.SetFamilyPrescribedAngVel(1, "0", f"{wheel_ang_vel}", "0", False)
         solver.AddFamilyPrescribedAcc(1, "none", "none", f"{(-SUPPLEMENTARY_FORCE / WHEEL_MASS)}")
 
-        solver.SetFamilyPrescribedAngVel(2, "0", f"{c.WHEEL_ANG_VEL_st}", "0", False)
+        solver.SetFamilyPrescribedAngVel(2, "0", f"{wheel_ang_vel}", "0", False)
         solver.AddFamilyPrescribedAcc(2, "none", "none", f"{(-SUPPLEMENTARY_FORCE / WHEEL_MASS)}")
         # family 2 becomes active after initialization
-
-        slip_vel = WHEEL_REF_LINEAR_VEL * (1.0 - slip_value)
-        # s = 1 - v/(omega*R)  ->  v = (1-s)(omega*R)
 
         solver.SetFamilyPrescribedLinVel(2, f"{slip_vel}", "0", "none", False)
 
@@ -181,39 +199,36 @@ for trial_num in range(NUM_TRIALS):
 
         df["clump_type"] = df["clump_type"].astype(str).str.strip()
 
-        for clump_type, g in df.groupby("clump_type"):
-
+        def template_for_label(clump_type):
             key = clump_type
             if key not in template_dict:
                 key = clump_type.zfill(2)
-
             if key not in template_dict:
-                if clump_type.isdigit():
-                    key = f"t{int(clump_type)}"
-                else:
-                    key = clump_type.lower()
-
+                key = f"t{int(clump_type)}" if clump_type.isdigit() else clump_type.lower()
             if key not in template_dict:
                 raise KeyError(f"Unknown clump_type in CSV: {clump_type}")
+            return template_dict[key]
 
-            xyz = g[["X", "Y", "Z"]].to_numpy(dtype=float)
-            quat = g[["Qw", "Qx", "Qy", "Qz"]].to_numpy(dtype=float)
+        xyz = df[["X", "Y", "Z"]].to_numpy(dtype=float)
+        templates = [template_for_label(value) for value in df["clump_type"]]
+        batch = solver.AddClumps(templates, xyz)
+        batch.SetFamilies([0] * xyz.shape[0])
+        # The mixed-template overload mirrors terrain generation and avoids a
+        # PyDEME ambiguity when a single-template batch happens to contain three rows.
+        if getattr(c, "TERRAIN_PARTICLE_SHAPE_st", "sphere") != "sphere":
+            quat = df[["Qx", "Qy", "Qz", "Qw"]].to_numpy(dtype=float)
+            batch.SetOriQ(quat.tolist())
+        # reconstruct terrain as generated
 
-            template = template_dict[key]
-
-            batch = solver.AddClumps(template, xyz)
-            batch.SetFamilies([0] * xyz.shape[0])
-            batch.SetOriQ(quat)
-            # reconstruct terrain as generated
-
-        wheel.SetInitPos([0, 0, df["Z"].max() + CURR_TERRAIN_RAD + WHEEL_RAD + 0.1e-3])
+        wheel.SetInitPos([0, 0, df["Z"].max() + CURR_TERRAIN_RAD + WHEEL_ENVELOPE_RADIUS + 0.1e-3])
         # place wheel just above terrain surface
 
         # --------------------------------------------------------------------------------------------------------------------
         # OUTPUT DIRECTORY SETUP
         # --------------------------------------------------------------------------------------------------------------------
 
-        folder_name = os.path.join(f"Trial {trial_num + 1}", f"Slip {slip_value:.1f}")
+        slip_name = slip_label(slip_value)
+        folder_name = os.path.join(f"Trial {trial_num + 1}", f"Slip {slip_name}")
         out_dir = os.path.join(c.SLIP_SINKAGE_OUT_DIR, folder_name)
 
         terrain_motion_dir = os.path.join(out_dir, SLIP_TERRAIN_MOTION_SUBDIR)
@@ -221,9 +236,18 @@ for trial_num in range(NUM_TRIALS):
         contact_forces_dir = os.path.join(out_dir, SLIP_CONTACT_FORCES_SUBDIR)
         settled_data_dir = os.path.join(out_dir, SLIP_SETTLED_SUBDIR)
 
-        os.makedirs(terrain_motion_dir, exist_ok=True)
-        os.makedirs(wheel_motion_dir, exist_ok=True)
-        os.makedirs(contact_forces_dir, exist_ok=True)
+        write_every = int(getattr(c, "SLIP_WRITE_EVERY_N_FRAMES_st", 100))
+        progress_every = int(getattr(c, "SLIP_PROGRESS_EVERY_N_FRAMES_st", write_every))
+        write_terrain = bool(getattr(c, "SLIP_WRITE_TERRAIN_st", True))
+        write_wheel = bool(getattr(c, "SLIP_WRITE_WHEEL_st", True))
+        write_contact = bool(getattr(c, "SLIP_WRITE_CONTACT_st", True))
+
+        if write_terrain:
+            os.makedirs(terrain_motion_dir, exist_ok=True)
+        if write_wheel:
+            os.makedirs(wheel_motion_dir, exist_ok=True)
+        if write_contact:
+            os.makedirs(contact_forces_dir, exist_ok=True)
         os.makedirs(settled_data_dir, exist_ok=True)
 
         # --------------------------------------------------------------------------------------------------------------------
@@ -232,9 +256,10 @@ for trial_num in range(NUM_TRIALS):
 
         solver.Initialize()
 
-        frame_time = 1e-3
+        frame_time = float(getattr(c, "SLIP_FRAME_TIME_S_st", 1e-3))
         t = 0.0
         frame = 0
+        wheel_wall_start = time.monotonic()
 
         solver.DoDynamicsThenSync(0)
         solver.ChangeFamily(1, 2)
@@ -242,29 +267,38 @@ for trial_num in range(NUM_TRIALS):
 
         while t < c.TRIAL_RUN_TIME_SLIP_SINKAGE_st:
 
-            if frame % 5 == 0:
-                print(f"Frame: {frame}, Trial: {trial_num + 1}, Slip: {slip_value}")
-
-                solver.WriteSphereFile(
-                    os.path.join(
-                        terrain_motion_dir,
-                        f"{c.SLIP_SINKAGE_TRIALS_MOTION_TERRAIN_FILE_NAME}_{frame:04d}.csv",
-                    )
+            if frame % progress_every == 0:
+                print(
+                    f"Wheel frame: {frame}, simulated: {t:.6g} s, "
+                    f"wall: {time.monotonic() - wheel_wall_start:.1f} s, "
+                    f"trial: {trial_num + 1}, slip: {slip_value}",
+                    flush=True,
                 )
 
-                solver.WriteMeshFile(
-                    os.path.join(
-                        wheel_motion_dir,
-                        f"{c.SLIP_SINKAGE_TRIALS_MOTION_WHEEL_FILE_NAME}_{frame:04d}.vtk",
+            if frame % write_every == 0:
+                if write_terrain:
+                    solver.WriteSphereFile(
+                        os.path.join(
+                            terrain_motion_dir,
+                            f"{c.SLIP_SINKAGE_TRIALS_MOTION_TERRAIN_FILE_NAME}_{frame:04d}.csv",
+                        )
                     )
-                )
 
-                solver.WriteContactFile(
-                    os.path.join(
-                        contact_forces_dir,
-                        f"{c.SLIP_SINKAGE_TRIALS_CONTACT_FORCE_FILE_NAME}_{frame:04d}.csv",
+                if write_wheel:
+                    solver.WriteMeshFile(
+                        os.path.join(
+                            wheel_motion_dir,
+                            f"{c.SLIP_SINKAGE_TRIALS_MOTION_WHEEL_FILE_NAME}_{frame:04d}.vtk",
+                        )
                     )
-                )
+
+                if write_contact:
+                    solver.WriteContactFile(
+                        os.path.join(
+                            contact_forces_dir,
+                            f"{c.SLIP_SINKAGE_TRIALS_CONTACT_FORCE_FILE_NAME}_{frame:04d}.csv",
+                        )
+                    )
 
             solver.DoDynamics(frame_time)
             t += frame_time
@@ -273,7 +307,7 @@ for trial_num in range(NUM_TRIALS):
         solver.WriteClumpFile(
             os.path.join(
                 settled_data_dir,
-                f"{c.SLIP_SINKAGE_TRIALS_SETTLED_DATA_FILE_NAME}_slip_{slip_value:.1f}.csv",
+                f"{c.SLIP_SINKAGE_TRIALS_SETTLED_DATA_FILE_NAME}_slip_{slip_name}.csv",
             )
         )
         # final terrain state after this slip case

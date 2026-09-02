@@ -1,0 +1,14 @@
+{
+  "duration_s": 0.35,
+  "manifests": [
+    "cases/solver_determinism_probe_mu1p05_lap03/determinism-probe-alabama-cub.json",
+    "cases/solver_determinism_probe_mu1p05_lap03/determinism-probe-alabama-cub-fixed-bin.json",
+    "cases/solver_determinism_probe_mu1p05_lap03/determinism-probe-alabama-cub-fixed-bin-cd20.json",
+    "cases/solver_determinism_probe_mu1p05_lap03/determinism-probe-alabama-cub-fixed-bin-cd1.json"
+  ],
+  "purpose": "Short exact-manifest solver determinism isolation before wheel ranking.",
+  "repeats_per_profile": 3,
+  "schema_version": 1,
+  "source_manifest": "cases/alabama_cub_lap03_repeatability/repeatability-cub-alabama-mu1p05-lap03-alabamawheel_collision_2mm-r01.json",
+  "source_manifest_sha256": "57cf431d05a2cb3fa00cfc25c8098d15537123808dc387a06d8cae9a8b95b371"
+}

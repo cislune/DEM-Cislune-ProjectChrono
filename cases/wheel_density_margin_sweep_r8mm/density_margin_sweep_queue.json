@@ -1,0 +1,10 @@
+{
+  "manifests": [
+    "cases/wheel_density_margin_sweep_r8mm/shared-bed-margin-0p18.json",
+    "cases/wheel_density_margin_sweep_r8mm/shared-bed-margin-0p35.json",
+    "cases/wheel_density_margin_sweep_r8mm/shared-bed-margin-0p42.json",
+    "cases/wheel_density_margin_sweep_r8mm/shared-bed-margin-0p55.json"
+  ],
+  "run_policy": "Run terrain stage only with one fixed seed. Select the margin with minimum absolute post-release density error, then repeat the selected setting across additional seeds before wheel use.",
+  "schema_version": 1
+}
