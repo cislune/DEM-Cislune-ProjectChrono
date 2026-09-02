@@ -60,6 +60,8 @@ def run_queue(
 def summarize_sensitivity(results_dir: Path) -> None:
     rows = []
     for path in sorted(results_dir.glob("sensitivity-*.json")):
+        if path.name == "sensitivity-summary.json":
+            continue
         result = json.loads(path.read_text())
         calibration = result.get("summaries", {}).get("calibration", {})
         held_out = result.get("summaries", {}).get("held_out_validation", {})
