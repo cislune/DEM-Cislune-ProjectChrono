@@ -14,6 +14,11 @@ def evaluate(summary: dict, manifest: dict, upper_bound_tolerance: float = 0.20)
             "measured_steady_tare_corrected_median_abs_torque_nm"
         ]
     )
+    active_reference = float(
+        manifest["sequence_condition"][
+            "measured_tare_corrected_median_abs_torque_nm"
+        ]
+    )
     torque = summary.get("torque_nm") or {}
     predicted = torque.get("median")
     ratio = predicted / reference if predicted is not None and reference > 0 else None
@@ -44,7 +49,13 @@ def evaluate(summary: dict, manifest: dict, upper_bound_tolerance: float = 0.20)
         "predicted_minimum_nm": torque.get("minimum"),
         "predicted_maximum_nm": torque.get("maximum"),
         "rider_steady_tare_corrected_upper_bound_nm": reference,
+        "rider_active_tare_corrected_upper_bound_nm": active_reference,
         "predicted_to_upper_bound_ratio": ratio,
+        "predicted_to_active_upper_bound_ratio": (
+            predicted / active_reference
+            if predicted is not None and active_reference > 0
+            else None
+        ),
         "upper_bound_tolerance_fraction": upper_bound_tolerance,
         "measured_compaction_reference_status": "NOT_AVAILABLE_IN_RIDER_EXPORT",
         "compaction_validation_status": "WITHHELD_PENDING_PAIRED_BED_MEASUREMENT",

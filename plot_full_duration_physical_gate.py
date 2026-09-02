@@ -28,6 +28,7 @@ def plot(summary: dict, gate: dict, output_path: Path) -> None:
     torques = [float(row["torque_nm"]) for row in completed]
     repeat_labels = [f"R{row['repeat']}" for row in completed]
     reference = float(gate["rider_steady_tare_corrected_upper_bound_nm"])
+    active_reference = float(gate["rider_active_tare_corrected_upper_bound_nm"])
     tolerance = float(gate["upper_bound_tolerance_fraction"])
     torque_cv = float(summary["torque_nm"]["coefficient_of_variation"])
     strain_range = float(summary["column_strain_proxy"]["range"])
@@ -54,6 +55,13 @@ def plot(summary: dict, gate: dict, output_path: Path) -> None:
         color="#25323A",
         linewidth=1.2,
         label=f"RIDER upper bound: {reference:.3f} N m",
+    )
+    axes[0].axhline(
+        active_reference,
+        color="#526D82",
+        linewidth=1.0,
+        linestyle=":",
+        label=f"Broader active window: {active_reference:.3f} N m",
     )
     axes[0].axhline(
         reference * (1 + tolerance),

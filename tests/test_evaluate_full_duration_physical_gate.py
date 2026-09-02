@@ -1,10 +1,11 @@
 from evaluate_full_duration_physical_gate import evaluate
 
 
-def manifest(reference=0.7025):
+def manifest(reference=0.7025, active_reference=0.825):
     return {
         "sequence_condition": {
-            "measured_steady_tare_corrected_median_abs_torque_nm": reference
+            "measured_steady_tare_corrected_median_abs_torque_nm": reference,
+            "measured_tare_corrected_median_abs_torque_nm": active_reference,
         }
     }
 
@@ -27,6 +28,7 @@ def test_passes_repeatable_prediction_below_physical_upper_bound():
         "NOT_AVAILABLE_IN_RIDER_EXPORT"
     )
     assert len(result["minimum_next_physical_record"]) == 5
+    assert result["rider_active_tare_corrected_upper_bound_nm"] == 0.825
 
 
 def test_rejects_prediction_that_exceeds_upper_bound_tolerance():
