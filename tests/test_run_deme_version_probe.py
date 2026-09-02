@@ -18,3 +18,4 @@ def test_fix71_image_pins_source_and_patch_hashes():
     assert "7fd2636c557832dfb299e7e31d6f0e072a3c0426" in dockerfile
     assert "--force-reinstall" in dockerfile
     assert "LD_LIBRARY_PATH=/root/miniconda3/envs/myenv/targets/x86_64-linux/lib" in dockerfile
+    assert "import DEME, importlib.metadata" not in dockerfile

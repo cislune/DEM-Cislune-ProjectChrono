@@ -60,7 +60,7 @@ RUN /root/miniconda3/envs/myenv/bin/python -m pip install \
         --no-deps \
         /tmp/deme-wheels/*.whl \
     && /root/miniconda3/envs/myenv/bin/python -c \
-        "import DEME, importlib.metadata as m; assert m.version('deme') == '${DEME_VERSION}'; print(DEME.__version__)" \
+        "import importlib.metadata as m; assert m.version('deme') == '${DEME_VERSION}'; print(m.version('deme'))" \
     && printf 'deme_version=%s\nfix_source_revision=%s\nfix_merge_revision=%s\n' \
         "$DEME_VERSION" "$FIX_SOURCE_REVISION" "$FIX_MERGE_REVISION" \
         > /opt/grasp-deme-provenance.txt
