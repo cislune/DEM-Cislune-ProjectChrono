@@ -2,7 +2,7 @@ from plot_solver_determinism_profiles import profile_label, status_color
 
 
 def test_profile_labels_are_human_readable():
-    assert profile_label("cub-fixed-bin-cd20") == "CUB + fixed bin + CD20"
+    assert profile_label("cub-fixed-bin-cd20") == "CD20"
     assert profile_label("custom-profile") == "custom profile"
 
 

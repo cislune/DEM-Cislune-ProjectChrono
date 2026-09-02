@@ -10,9 +10,9 @@ from pathlib import Path
 
 PROFILE_LABELS = {
     "cub": "CUB",
-    "cub-fixed-bin": "CUB + fixed bin",
-    "cub-fixed-bin-cd20": "CUB + fixed bin + CD20",
-    "cub-fixed-bin-cd1": "CUB + fixed bin + CD1",
+    "cub-fixed-bin": "Fixed bin",
+    "cub-fixed-bin-cd20": "CD20",
+    "cub-fixed-bin-cd1": "CD1",
 }
 
 STATUS_COLORS = {
@@ -159,7 +159,7 @@ def plot(
         )
 
     figure.suptitle(
-        "GRASP DEM exact-manifest solver repeatability",
+        "GRASP DEM solver repeatability",
         x=0.055,
         y=0.98,
         ha="left",
