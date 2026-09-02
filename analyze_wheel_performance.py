@@ -147,6 +147,18 @@ def lane_metrics(
     }
 
 
+def solver_execution_profile(manifest: dict) -> dict:
+    solver = manifest.get("solver", {})
+    keys = (
+        "use_cub_force_collection",
+        "sort_contact_pairs",
+        "disable_adaptive_bin_size",
+        "cd_update_frequency",
+        "disable_adaptive_update_frequency",
+    )
+    return {key: solver[key] for key in keys if key in solver}
+
+
 def analyze(case_dir: Path) -> dict:
     manifest = json.loads((case_dir / "frozen_case.json").read_text())
     runtime_path = case_dir / "runtime_environment.json"
@@ -245,6 +257,7 @@ def analyze(case_dir: Path) -> dict:
         ),
         "project_git_revision": runtime.get("project_git_revision"),
         "project_git_dirty": runtime.get("project_git_dirty"),
+        "solver_execution": solver_execution_profile(manifest),
         "status": "PASS_COMPARATIVE_METRICS" if active else "REJECT_NO_WHEEL_CONTACT",
         "analysis_policy": analysis_policy,
         "warnings": [],

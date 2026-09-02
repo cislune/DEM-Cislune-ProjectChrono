@@ -45,6 +45,26 @@ class AnalyzeWheelPerformanceTests(unittest.TestCase):
             gate = analysis.density_gate(Path(temp_dir))
         self.assertEqual(gate["status"], "REJECT_DENSITY_MISMATCH")
 
+    def test_solver_execution_profile_carries_explicit_controls_only(self):
+        profile = analysis.solver_execution_profile(
+            {
+                "solver": {
+                    "max_velocity_m_s": 20.0,
+                    "use_cub_force_collection": True,
+                    "cd_update_frequency": 20,
+                    "disable_adaptive_update_frequency": True,
+                }
+            }
+        )
+        self.assertEqual(
+            profile,
+            {
+                "use_cub_force_collection": True,
+                "cd_update_frequency": 20,
+                "disable_adaptive_update_frequency": True,
+            },
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
