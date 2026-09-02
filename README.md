@@ -64,6 +64,13 @@ DEME defaults. The `repeatability-cub` queue uses CUB force reduction and sorted
 contact pairs to test whether GPU accumulation order is a material source of
 run-to-run spread.
 
+The current Alabama control uses DEME 2.3.3 with the merged initialization fix
+from DEM-Engine issue 71, CUB force collection, sorted contact pairs, a fixed
+contact-detection bin, disabled adaptive update frequency, and contact-detection
+update frequency 1 (`cub-fixed-bin-cd1`). This is an evidence-backed execution
+profile, not a universal DEME default. Requalify it when the DEME version, CUDA
+runtime, GPU architecture, force model, or particle resolution changes.
+
 ```bash
 python generate_wheel_repeatability_cases.py \
   --source-queue cases/frozen_candidate_screen_mu0p9_r8mm/frozen_candidate_screen_queue.json \
@@ -76,6 +83,18 @@ python generate_wheel_repeatability_cases.py \
 
 Evaluate standard and CUB outputs separately. Treat a lower spread as a numerical
 stability result; it does not replace multi-bed or held-out physical validation.
+The short exact-manifest gate requires three successful repeats, torque
+coefficient of variation no greater than 15%, and column-strain range no greater
+than 0.03. Preserve frame hashes with
+`diagnose_exact_repeat_divergence.py`. Only a passing profile may advance to the
+full-duration RIDER comparison.
+
+The RIDER torque export is a plausibility bound because it retains dynamic rig
+and drivetrain losses. It contains no paired rut, surface-profile, density, or
+pre/post penetrometer response. Absolute compaction validation therefore remains
+withheld until a physical run records bed preparation, pre/post geotechnical
+response at fixed offsets, rut geometry, wheel geometry, load, speed, slip, and
+lap sequence.
 
 ## Tests
 
