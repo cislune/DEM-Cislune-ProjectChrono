@@ -1,0 +1,27 @@
+from run_exact_manifest_repeats import summarize, variation
+
+
+def test_variation_reports_cv_and_range():
+    result = variation([1.0, 1.1, 0.9])
+    assert abs(result["mean"] - 1.0) < 1e-12
+    assert abs(result["range"] - 0.2) < 1e-12
+    assert abs(result["coefficient_of_variation"] - 0.1) < 1e-12
+
+
+def test_summary_rejects_unstable_complete_probe(tmp_path):
+    manifest = tmp_path / "case.json"
+    manifest.write_text("{}\n")
+    rows = [
+        {
+            "completed": True,
+            "torque_nm": torque,
+            "column_strain_proxy": strain,
+        }
+        for torque, strain in ((1.0, 0.01), (1.8, 0.08), (0.9, 0.02))
+    ]
+
+    result = summarize(manifest, tmp_path, rows, 3, 0.15, 0.03)
+
+    assert result["status"] == "REJECT_QUALITY_GATE"
+    assert not result["quality_gate"]["torque_cv"]["pass"]
+    assert not result["quality_gate"]["column_strain_range"]["pass"]
