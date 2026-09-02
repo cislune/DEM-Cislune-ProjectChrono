@@ -1,6 +1,22 @@
 import json
+from pathlib import Path
 
-from generate_rtgs_penetrometer_sequences import DESIGNS, generate
+from generate_rtgs_penetrometer_sequences import DESIGNS, generate, ordered_laps
+
+
+def test_ordered_laps_recovers_numeric_order_from_lexically_sorted_folders():
+    laps = []
+    for folder in ("Laps1-5", "Laps11-15", "Laps6-10"):
+        for reported_lap in range(1, 6):
+            laps.append(
+                {
+                    "source": f"/archive/{folder}/{reported_lap}.TXT",
+                    "reported_lap": reported_lap,
+                }
+            )
+    ordered = ordered_laps(laps)
+    assert [lap for lap, _ in ordered] == list(range(1, 16))
+    assert Path(ordered[5][1]["source"]).parent.name == "Laps6-10"
 
 
 def test_generate_chains_two_fifty_lap_held_out_sequences(tmp_path):

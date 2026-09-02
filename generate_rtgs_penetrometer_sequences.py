@@ -7,6 +7,7 @@ import argparse
 import copy
 import json
 from pathlib import Path
+import re
 
 from dem_case_runner import sha256_file
 from generate_alabama_friction_sweep import (
@@ -26,6 +27,26 @@ DESIGNS = {
 
 def slug(value: str) -> str:
     return value.lower().replace("_", "-")
+
+
+def ordered_laps(laps: list[dict]) -> list[tuple[int, dict]]:
+    """Recover global lap numbers from archives whose folder names sort lexically."""
+    numbered = []
+    for fallback, measured in enumerate(laps, 1):
+        source = str(measured.get("source", "")).replace("\\", "/")
+        match = re.search(r"/Laps(\d+)-(\d+)/", source, re.IGNORECASE)
+        if match and measured.get("reported_lap") is not None:
+            lap_number = int(match.group(1)) + int(measured["reported_lap"]) - 1
+            if lap_number > int(match.group(2)):
+                raise ValueError(f"Lap {lap_number} falls outside archive folder {match.group(0)}")
+        else:
+            lap_number = fallback
+        numbered.append((lap_number, measured))
+    numbered.sort(key=lambda item: item[0])
+    lap_numbers = [lap_number for lap_number, _ in numbered]
+    if lap_numbers != list(range(1, len(numbered) + 1)):
+        raise ValueError(f"Historical telemetry lap sequence is not contiguous: {lap_numbers}")
+    return numbered
 
 
 def generate(
@@ -53,7 +74,7 @@ def generate(
 
     for design, filename in DESIGNS.items():
         base = json.loads((case_dir / filename).read_text())
-        laps = telemetry["designs"][design]["laps"]
+        laps = ordered_laps(telemetry["designs"][design]["laps"])
         if len(laps) != 50:
             raise ValueError(f"Expected 50 telemetry laps for {design}, found {len(laps)}")
         physical_campaigns = [
@@ -69,7 +90,7 @@ def generate(
         manifests = []
         previous_case_id = None
         previous_slip = None
-        for lap_number, measured in enumerate(laps, 1):
+        for lap_number, measured in laps:
             load_kg = float(measured["active_load_kg_reported"]["median"])
             speed = float(measured["derived_carriage_speed_m_s"]["median"])
             slip = float(measured["derived_slip"]["median"])
@@ -130,6 +151,8 @@ def generate(
                 "measured_median_active_load_kg_reported": load_kg,
                 "measured_median_carriage_speed_m_s": speed,
                 "measured_median_slip": slip,
+                "source_reported_lap": measured.get("reported_lap"),
+                "source_archive_folder": Path(str(measured.get("source", ""))).parent.name,
                 "frozen_wheel_friction": wheel_friction,
                 "prior_case_id": previous_case_id,
                 "shared_bed_case_id": bed_case_id,
