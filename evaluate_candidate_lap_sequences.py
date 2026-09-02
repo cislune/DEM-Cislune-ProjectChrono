@@ -18,6 +18,7 @@ def evaluate(output_root: Path) -> dict:
         condition = manifest.get("candidate_sequence")
         if not condition:
             continue
+        provenance = manifest.get("provenance", {})
         strain = float(result["lane"]["column_strain_proxy"])
         grouped.setdefault(condition["candidate"], []).append(
             {
@@ -29,6 +30,12 @@ def evaluate(output_root: Path) -> dict:
                 "settlement_m": float(result["lane"]["p95_surface_settlement_m"]),
                 "density_ratio_increment": 1.0 / (1.0 - strain),
                 "density_gate_status": result["density_gate"]["status"],
+                "design_obj_path": provenance.get("design_obj_path")
+                or manifest.get("wheel", {}).get("design_obj"),
+                "design_obj_sha256": provenance.get("design_obj_sha256"),
+                "source_obj_path": provenance.get("source_obj_path")
+                or manifest.get("wheel", {}).get("obj"),
+                "source_obj_sha256": provenance.get("source_obj_sha256"),
                 "result_json": str(result_path),
             }
         )
@@ -36,6 +43,26 @@ def evaluate(output_root: Path) -> dict:
     rows = []
     for candidate, laps in grouped.items():
         laps.sort(key=lambda item: item["lap"])
+        design_hashes = sorted(
+            {lap["design_obj_sha256"] for lap in laps if lap["design_obj_sha256"]}
+        )
+        source_hashes = sorted(
+            {lap["source_obj_sha256"] for lap in laps if lap["source_obj_sha256"]}
+        )
+        design_paths = sorted(
+            {lap["design_obj_path"] for lap in laps if lap["design_obj_path"]}
+        )
+        source_paths = sorted(
+            {lap["source_obj_path"] for lap in laps if lap["source_obj_path"]}
+        )
+        mixed_geometry = len(design_hashes) > 1 or len(source_hashes) > 1
+        geometry_status = (
+            "REJECT_MIXED_GEOMETRY"
+            if mixed_geometry
+            else "VERIFIED_SINGLE_GEOMETRY"
+            if len(design_hashes) == 1 and len(source_hashes) == 1
+            else "UNVERIFIED_MISSING_HASH"
+        )
         cumulative_density_ratio = 1.0
         for lap in laps:
             cumulative_density_ratio *= lap["density_ratio_increment"]
@@ -57,6 +84,11 @@ def evaluate(output_root: Path) -> dict:
                 "all_density_gates_pass": all(
                     lap["density_gate_status"] == "PASS_DENSITY" for lap in laps
                 ),
+                "geometry_provenance_status": geometry_status,
+                "design_obj_paths": design_paths,
+                "design_obj_sha256": design_hashes[0] if len(design_hashes) == 1 else None,
+                "source_obj_paths": source_paths,
+                "source_obj_sha256": source_hashes[0] if len(source_hashes) == 1 else None,
             }
         )
     rows.sort(key=lambda item: item["candidate"])
@@ -79,9 +111,18 @@ def evaluate(output_root: Path) -> dict:
     complete = bool(rows) and smooth is not None and all(
         row["completed_laps"] == 10 for row in rows
     )
+    mixed_geometry = any(
+        row["geometry_provenance_status"] == "REJECT_MIXED_GEOMETRY" for row in rows
+    )
     return {
         "schema_version": 1,
-        "status": "COMPLETE" if complete else "PARTIAL",
+        "status": (
+            "REJECT_MIXED_GEOMETRY"
+            if mixed_geometry
+            else "COMPLETE"
+            if complete
+            else "PARTIAL"
+        ),
         "qualification": (
             "Repeated-traffic geometry comparison on the frozen 8 mm pilot bed. "
             "Absolute compaction remains withheld because the physical density gate fails."

@@ -54,6 +54,18 @@ def test_rows(wheels: list[dict], phase: str) -> list[dict]:
     return rows
 
 
+def wheel_record(row: dict, role: str) -> dict:
+    return {
+        "wheel": row["candidate"],
+        "role": role,
+        "geometry_provenance_status": row.get("geometry_provenance_status"),
+        "design_obj_paths": row.get("design_obj_paths", []),
+        "design_obj_sha256": row.get("design_obj_sha256"),
+        "source_obj_paths": row.get("source_obj_paths", []),
+        "source_obj_sha256": row.get("source_obj_sha256"),
+    }
+
+
 def build(candidate_summary: Path, repeatability_summary: Path) -> dict:
     candidates = json.loads(candidate_summary.read_text())
     repeatability = json.loads(repeatability_summary.read_text())
@@ -66,6 +78,7 @@ def build(candidate_summary: Path, repeatability_summary: Path) -> dict:
         and row.get("density_ratio_gain_vs_smooth") is not None
         and row.get("drawbar_vs_smooth") is not None
         and row.get("torque_vs_smooth") is not None
+        and row.get("geometry_provenance_status") != "REJECT_MIXED_GEOMETRY"
     ]
     mobility_gated = [
         row
@@ -84,21 +97,24 @@ def build(candidate_summary: Path, repeatability_summary: Path) -> dict:
         )
     )
     selected = frontier[:2]
-    mvp_wheels = [
-        {"wheel": "alabama_reference", "role": "calibration anchor"},
-        {"wheel": "smooth_control", "role": "bed and rig control"},
-    ]
+    smooth = next(
+        (
+            row
+            for row in candidates.get("candidates", [])
+            if row.get("candidate") == "smooth_control"
+        ),
+        None,
+    )
+    mvp_wheels = [{"wheel": "alabama_reference", "role": "calibration anchor"}]
+    mvp_wheels.append(
+        wheel_record(smooth, "bed and rig control")
+        if smooth
+        else {"wheel": "smooth_control", "role": "bed and rig control"}
+    )
     if selected:
-        mvp_wheels.append(
-            {"wheel": selected[0]["candidate"], "role": "DEM-selected candidate"}
-        )
+        mvp_wheels.append(wheel_record(selected[0], "DEM-selected candidate"))
     expansion_wheels = (
-        [
-            {
-                "wheel": selected[1]["candidate"],
-                "role": "second Pareto candidate",
-            }
-        ]
+        [wheel_record(selected[1], "second Pareto candidate")]
         if len(selected) > 1
         else []
     )
