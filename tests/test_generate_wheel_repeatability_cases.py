@@ -75,6 +75,7 @@ def test_generate_cub_repeatability_profile_is_explicit(tmp_path):
             "use_cub_force_collection": True,
             "sort_contact_pairs": True,
         },
+        bed_state_relative_path="wheel/slip/pass/final.csv",
     )
 
     generated = json.loads(queue_path.read_text())
@@ -85,3 +86,7 @@ def test_generate_cub_repeatability_profile_is_explicit(tmp_path):
     assert first["solver"]["max_velocity_m_s"] == 20.0
     assert first["solver"]["use_cub_force_collection"] is True
     assert first["repeatability_target"]["execution_profile"] == "repeatability-cub"
+    assert (
+        first["terrain"]["initial_state_relative_path"]
+        == "wheel/slip/pass/final.csv"
+    )

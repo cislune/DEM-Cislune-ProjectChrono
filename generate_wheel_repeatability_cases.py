@@ -23,6 +23,7 @@ def generate(
     bed_state_sha256: str | None = None,
     case_prefix: str = "repeatability",
     solver_overrides: dict | None = None,
+    bed_state_relative_path: str | None = None,
 ) -> Path:
     if replicates < 2:
         raise ValueError("Repeatability campaign requires at least two replicates")
@@ -57,7 +58,12 @@ def generate(
             )
             case["terrain"]["initial_state_case_id"] = bed_case_id
             case["terrain"]["initial_state_filename"] = "settled_terrain_data.csv"
-            case["terrain"].pop("initial_state_relative_path", None)
+            if bed_state_relative_path:
+                case["terrain"]["initial_state_relative_path"] = (
+                    bed_state_relative_path
+                )
+            else:
+                case["terrain"].pop("initial_state_relative_path", None)
             case.setdefault("solver", {}).update(solver_overrides)
             case["repeatability_target"] = {
                 "candidate": candidate,
@@ -68,6 +74,7 @@ def generate(
                 "source_manifest_sha256": sha256_file(source_path),
                 "shared_bed_case_id": bed_case_id,
                 "shared_bed_state_sha256": bed_state_sha256,
+                "shared_bed_state_relative_path": bed_state_relative_path,
                 "solver_overrides": solver_overrides,
                 "qualification": (
                     "This campaign measures numerical repeatability on one fixed coarse bed; "
@@ -89,6 +96,7 @@ def generate(
                 "replicates_per_candidate": replicates,
                 "shared_bed_case_id": bed_case_id,
                 "shared_bed_state_sha256": bed_state_sha256,
+                "shared_bed_state_relative_path": bed_state_relative_path,
                 "solver_overrides": solver_overrides,
                 "manifests": [
                     str(path.relative_to(project_root)) for path in manifests
@@ -117,6 +125,7 @@ def main() -> int:
     )
     parser.add_argument("--bed-case-id", required=True)
     parser.add_argument("--bed-state-sha256")
+    parser.add_argument("--bed-state-relative-path")
     parser.add_argument("--replicates", type=int, default=3)
     parser.add_argument("--candidates", nargs="+", default=list(DEFAULT_CANDIDATES))
     parser.add_argument("--case-prefix", default="repeatability")
@@ -141,6 +150,7 @@ def main() -> int:
         bed_state_sha256=args.bed_state_sha256,
         case_prefix=args.case_prefix,
         solver_overrides=solver_overrides,
+        bed_state_relative_path=args.bed_state_relative_path,
     )
     print(f"Repeatability queue: {queue}")
     return 0

@@ -1,0 +1,21 @@
+{
+  "campaign": "same-bed numerical repeatability",
+  "candidates": [
+    "alabamawheel_collision_2mm"
+  ],
+  "execution_profile": "repeatability-cub-alabama-mu1p05-lap03",
+  "manifests": [
+    "cases/alabama_cub_lap03_repeatability/repeatability-cub-alabama-mu1p05-lap03-alabamawheel_collision_2mm-r01.json",
+    "cases/alabama_cub_lap03_repeatability/repeatability-cub-alabama-mu1p05-lap03-alabamawheel_collision_2mm-r02.json",
+    "cases/alabama_cub_lap03_repeatability/repeatability-cub-alabama-mu1p05-lap03-alabamawheel_collision_2mm-r03.json"
+  ],
+  "replicates_per_candidate": 3,
+  "schema_version": 1,
+  "shared_bed_case_id": "alabama-sensitivity-wheel_mu1p05-lap02",
+  "shared_bed_state_relative_path": "wheel/slip_0.093596/pass_01/Trial 1/Slip 0.093596/settled data/slip_sinkage_settled_data_slip_0.093596.csv",
+  "shared_bed_state_sha256": "4cc2599e09d403e74c6ee223d2decbb767a988e9225eae339823245f855a1d2b",
+  "solver_overrides": {
+    "sort_contact_pairs": true,
+    "use_cub_force_collection": true
+  }
+}
