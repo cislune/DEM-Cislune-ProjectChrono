@@ -1,0 +1,23 @@
+{
+  "baseline_queue": "cases/alabama_rider_sequence_mu0p9_r8mm/alabama_rider_sequence_queue.json",
+  "campaign": "Alabama RIDER one-factor sensitivity",
+  "interpretation": "Select wheel friction using laps 1-5 only. Use laps 6-10 to assess generalization. Treat soil-property and timestep cases as sensitivity, not additional fitted parameter sets.",
+  "scenario_queues": [
+    "cases/refinement_sensitivity_r8mm/baseline/sequence_queue.json",
+    "cases/refinement_sensitivity_r8mm/wheel_mu0p75/sequence_queue.json",
+    "cases/refinement_sensitivity_r8mm/wheel_mu0p825/sequence_queue.json",
+    "cases/refinement_sensitivity_r8mm/wheel_mu0p975/sequence_queue.json",
+    "cases/refinement_sensitivity_r8mm/wheel_mu1p05/sequence_queue.json",
+    "cases/refinement_sensitivity_r8mm/particle_mu0p4/sequence_queue.json",
+    "cases/refinement_sensitivity_r8mm/particle_mu0p6/sequence_queue.json",
+    "cases/refinement_sensitivity_r8mm/rolling0p05/sequence_queue.json",
+    "cases/refinement_sensitivity_r8mm/rolling0p15/sequence_queue.json",
+    "cases/refinement_sensitivity_r8mm/youngs150mpa/sequence_queue.json",
+    "cases/refinement_sensitivity_r8mm/youngs600mpa/sequence_queue.json",
+    "cases/refinement_sensitivity_r8mm/restitution0p1/sequence_queue.json",
+    "cases/refinement_sensitivity_r8mm/restitution0p5/sequence_queue.json",
+    "cases/refinement_sensitivity_r8mm/timestep2p5us/sequence_queue.json",
+    "cases/refinement_sensitivity_r8mm/timestep7p5us/sequence_queue.json"
+  ],
+  "schema_version": 1
+}

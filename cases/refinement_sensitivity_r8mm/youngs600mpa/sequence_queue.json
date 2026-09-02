@@ -1,0 +1,22 @@
+{
+  "calibration_split": "laps 1-5",
+  "campaign_scenario": "youngs600mpa",
+  "held_out_validation_split": "laps 6-10",
+  "manifests": [
+    "cases/refinement_sensitivity_r8mm/youngs600mpa/alabama-sensitivity-youngs600mpa-lap01.json",
+    "cases/refinement_sensitivity_r8mm/youngs600mpa/alabama-sensitivity-youngs600mpa-lap02.json",
+    "cases/refinement_sensitivity_r8mm/youngs600mpa/alabama-sensitivity-youngs600mpa-lap03.json",
+    "cases/refinement_sensitivity_r8mm/youngs600mpa/alabama-sensitivity-youngs600mpa-lap04.json",
+    "cases/refinement_sensitivity_r8mm/youngs600mpa/alabama-sensitivity-youngs600mpa-lap05.json",
+    "cases/refinement_sensitivity_r8mm/youngs600mpa/alabama-sensitivity-youngs600mpa-lap06.json",
+    "cases/refinement_sensitivity_r8mm/youngs600mpa/alabama-sensitivity-youngs600mpa-lap07.json",
+    "cases/refinement_sensitivity_r8mm/youngs600mpa/alabama-sensitivity-youngs600mpa-lap08.json",
+    "cases/refinement_sensitivity_r8mm/youngs600mpa/alabama-sensitivity-youngs600mpa-lap09.json",
+    "cases/refinement_sensitivity_r8mm/youngs600mpa/alabama-sensitivity-youngs600mpa-lap10.json"
+  ],
+  "schema_version": 1,
+  "sensitivity_overrides": {
+    "youngs_modulus_pa": 600000000.0
+  },
+  "state_transfer": "each lap imports the preceding lap final soil state"
+}

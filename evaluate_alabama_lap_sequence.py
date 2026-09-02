@@ -10,14 +10,21 @@ from pathlib import Path
 import statistics
 
 
-def evaluate(output_root: Path) -> dict:
+def evaluate(output_root: Path, scenario: str | None = None) -> dict:
     rows = []
-    for result_path in sorted(
-        output_root.glob("alabama-rider-sequence-mu*-lap*/wheel_performance.json")
-    ):
+    pattern = (
+        "*/wheel_performance.json"
+        if scenario is not None
+        else "alabama-rider-sequence-mu*-lap*/wheel_performance.json"
+    )
+    for result_path in sorted(output_root.glob(pattern)):
         result = json.loads(result_path.read_text())
         manifest = json.loads((result_path.parent / "frozen_case.json").read_text())
-        condition = manifest["sequence_condition"]
+        condition = manifest.get("sequence_condition")
+        if not condition:
+            continue
+        if scenario is not None and condition.get("campaign_scenario") != scenario:
+            continue
         predicted = float(result["mobility"]["torque_y_nm"]["median_abs"])
         observed = float(
             condition["measured_tare_corrected_median_abs_torque_nm"]
@@ -143,8 +150,9 @@ def main() -> int:
     parser.add_argument("output_root", type=Path)
     parser.add_argument("--json", type=Path, required=True, dest="json_path")
     parser.add_argument("--csv", type=Path, required=True, dest="csv_path")
+    parser.add_argument("--scenario")
     args = parser.parse_args()
-    result = evaluate(args.output_root.resolve())
+    result = evaluate(args.output_root.resolve(), args.scenario)
     write(result, args.json_path.resolve(), args.csv_path.resolve())
     print(result["status"])
     for split, summary in result["summaries"].items():

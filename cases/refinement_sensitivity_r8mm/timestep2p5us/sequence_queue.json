@@ -1,0 +1,22 @@
+{
+  "calibration_split": "laps 1-5",
+  "campaign_scenario": "timestep2p5us",
+  "held_out_validation_split": "laps 6-10",
+  "manifests": [
+    "cases/refinement_sensitivity_r8mm/timestep2p5us/alabama-sensitivity-timestep2p5us-lap01.json",
+    "cases/refinement_sensitivity_r8mm/timestep2p5us/alabama-sensitivity-timestep2p5us-lap02.json",
+    "cases/refinement_sensitivity_r8mm/timestep2p5us/alabama-sensitivity-timestep2p5us-lap03.json",
+    "cases/refinement_sensitivity_r8mm/timestep2p5us/alabama-sensitivity-timestep2p5us-lap04.json",
+    "cases/refinement_sensitivity_r8mm/timestep2p5us/alabama-sensitivity-timestep2p5us-lap05.json",
+    "cases/refinement_sensitivity_r8mm/timestep2p5us/alabama-sensitivity-timestep2p5us-lap06.json",
+    "cases/refinement_sensitivity_r8mm/timestep2p5us/alabama-sensitivity-timestep2p5us-lap07.json",
+    "cases/refinement_sensitivity_r8mm/timestep2p5us/alabama-sensitivity-timestep2p5us-lap08.json",
+    "cases/refinement_sensitivity_r8mm/timestep2p5us/alabama-sensitivity-timestep2p5us-lap09.json",
+    "cases/refinement_sensitivity_r8mm/timestep2p5us/alabama-sensitivity-timestep2p5us-lap10.json"
+  ],
+  "schema_version": 1,
+  "sensitivity_overrides": {
+    "time_step_s": 2.5e-06
+  },
+  "state_transfer": "each lap imports the preceding lap final soil state"
+}
