@@ -23,6 +23,10 @@ def test_passes_repeatable_prediction_below_physical_upper_bound():
     assert result["physical_plausibility_status"] == (
         "WITHIN_20_PERCENT_OF_PHYSICAL_UPPER_BOUND"
     )
+    assert result["measured_compaction_reference_status"] == (
+        "NOT_AVAILABLE_IN_RIDER_EXPORT"
+    )
+    assert len(result["minimum_next_physical_record"]) == 5
 
 
 def test_rejects_prediction_that_exceeds_upper_bound_tolerance():

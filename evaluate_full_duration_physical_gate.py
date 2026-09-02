@@ -46,16 +46,27 @@ def evaluate(summary: dict, manifest: dict, upper_bound_tolerance: float = 0.20)
         "rider_steady_tare_corrected_upper_bound_nm": reference,
         "predicted_to_upper_bound_ratio": ratio,
         "upper_bound_tolerance_fraction": upper_bound_tolerance,
+        "measured_compaction_reference_status": "NOT_AVAILABLE_IN_RIDER_EXPORT",
+        "compaction_validation_status": "WITHHELD_PENDING_PAIRED_BED_MEASUREMENT",
+        "minimum_next_physical_record": [
+            "documented bed preparation and reset condition",
+            "pre-run GTI or cone-resistance profile at fixed offsets",
+            "post-run GTI or cone-resistance profile at the same offsets",
+            "post-run rut depth and width or equivalent surface profile",
+            "wheel geometry, normal load, speed, slip, and lap sequence",
+        ],
         "decision": (
-            "Proceed to controlled candidate screening, while retaining provisional physical "
-            "calibration status."
+            "Proceed to exploratory candidate screening and a paired physical compaction test, "
+            "while retaining provisional torque plausibility and withholding absolute compaction "
+            "claims."
             if status == "PASS_PROVISIONAL_PLAUSIBILITY"
             else "Do not resume candidate ranking from this solver profile."
         ),
         "qualification": (
             "The RIDER value retains dynamic rig and drivetrain losses and is therefore an "
             "upper bound on wheel-soil contact torque. A DEM prediction below that value is "
-            "not disproven, but does not by itself establish calibrated accuracy."
+            "not disproven, but does not by itself establish calibrated accuracy. The RIDER "
+            "export has no paired physical compaction observable."
         ),
     }
 
