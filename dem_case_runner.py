@@ -439,19 +439,33 @@ def preflight_case(
         if Path(initial_state_case_id).name != initial_state_case_id:
             failures.append("initial_state_case_id must be a plain case identifier")
         else:
-            initial_state_filename = terrain.get(
-                "initial_state_filename", "settled_terrain_data.csv"
-            )
-            if Path(initial_state_filename).name != initial_state_filename:
-                failures.append("initial_state_filename must be a plain filename")
+            relative_state = terrain.get("initial_state_relative_path")
+            if relative_state is not None:
+                relative_path = Path(str(relative_state))
+                source_case_root = (output_root / initial_state_case_id).resolve()
+                if relative_path.is_absolute() or ".." in relative_path.parts:
+                    failures.append(
+                        "initial_state_relative_path must stay inside the source case directory"
+                    )
+                    initial_state_path = None
+                else:
+                    initial_state_path = (source_case_root / relative_path).resolve()
             else:
-                initial_state_path = (
-                    output_root
-                    / initial_state_case_id
-                    / "terrain"
-                    / "settled terrain data"
-                    / initial_state_filename
+                initial_state_filename = terrain.get(
+                    "initial_state_filename", "settled_terrain_data.csv"
                 )
+                if Path(initial_state_filename).name != initial_state_filename:
+                    failures.append("initial_state_filename must be a plain filename")
+                    initial_state_path = None
+                else:
+                    initial_state_path = (
+                        output_root
+                        / initial_state_case_id
+                        / "terrain"
+                        / "settled terrain data"
+                        / initial_state_filename
+                    )
+            if initial_state_path is not None:
                 if initial_state_path.is_file():
                     case["_resolved_initial_state_csv"] = str(initial_state_path)
                 else:

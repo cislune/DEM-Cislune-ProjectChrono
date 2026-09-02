@@ -7,6 +7,7 @@ import argparse
 import copy
 import json
 from pathlib import Path
+import statistics
 
 from dem_case_runner import sha256_file
 
@@ -51,9 +52,14 @@ def generate(
     profile = json.loads(process_profile_path.read_text())
     reference = json.loads(reference_path.read_text())
     calibration_laps = reference["laps"][:5]
-    target_torque = sorted(
-        float(lap["active_abs_torque_nm"]["median"]) for lap in calibration_laps
-    )[len(calibration_laps) // 2]
+    target_torque = statistics.median(
+        float(lap["active_tare_corrected_abs_torque_nm"]["median"])
+        for lap in calibration_laps
+    )
+    raw_target_torque = statistics.median(
+        float(lap["active_abs_torque_nm"]["median"])
+        for lap in calibration_laps
+    )
     target_load_kg = sorted(
         float(lap["active_load_kg_reported"]["median"]) for lap in calibration_laps
     )[len(calibration_laps) // 2]
@@ -113,6 +119,8 @@ def generate(
             "source_reference_sha256": sha256_file(reference_path),
             "split": "Alabama RIDER laps 1-5",
             "median_abs_torque_nm": target_torque,
+            "metric": "active_tare_corrected_abs_torque_nm.median",
+            "raw_median_abs_torque_nm": raw_target_torque,
             "median_active_load_kg_reported": target_load_kg,
             "median_slip": target_slip,
             "median_carriage_speed_m_s": target_speed,
@@ -123,7 +131,10 @@ def generate(
             "shared_bed_state_sha256": bed_state_sha256,
             "qualification": (
                 "The shared 8 mm bed is below the measured out-track bulk density. "
-                "This sweep brackets wheel-interface response but cannot close absolute validation."
+                "RIDER torque is corrected by the same-lap, same-direction loaded-stationary "
+                "baseline, but still includes dynamic rig losses. The corrected target is "
+                "therefore an upper bound on wheel-soil torque. This sweep brackets response "
+                "but cannot close absolute validation."
             ),
         }
         destination = output_dir / f"{case['case_id']}.json"

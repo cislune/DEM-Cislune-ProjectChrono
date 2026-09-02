@@ -133,7 +133,30 @@ f 2 7 6
             manifest.write_text(json.dumps(case))
             frozen, _, report = runner.preflight_case(manifest, root, output_root)
         self.assertEqual(report["status"], "PASS")
-        self.assertEqual(frozen["_resolved_initial_state_csv"], str(state))
+        self.assertEqual(
+            Path(frozen["_resolved_initial_state_csv"]).resolve(), state.resolve()
+        )
+
+    def test_initial_state_relative_path_can_chain_prior_wheel_state(self):
+        root = Path(__file__).resolve().parents[1]
+        source_manifest = root / "cases" / "alabama_rider_smoke.json"
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_root = Path(temp_dir)
+            relative = Path("wheel/slip_0.1/pass_01/final.csv")
+            state = output_root / "lap-01" / relative
+            state.parent.mkdir(parents=True)
+            state.write_text("X,Y,Z,clump_type\n0,0,0,t0\n")
+            manifest = output_root / "lap-02.json"
+            case = json.loads(source_manifest.read_text())
+            case["case_id"] = "lap-02"
+            case["terrain"]["initial_state_case_id"] = "lap-01"
+            case["terrain"]["initial_state_relative_path"] = str(relative)
+            manifest.write_text(json.dumps(case))
+            frozen, _, report = runner.preflight_case(manifest, root, output_root)
+        self.assertEqual(report["status"], "PASS")
+        self.assertEqual(
+            Path(frozen["_resolved_initial_state_csv"]).resolve(), state.resolve()
+        )
 
 
 if __name__ == "__main__":

@@ -23,6 +23,7 @@ REQUIRED_COLUMNS = {
     "wheelCmPerSec",
     "desiredCmPerSec",
     "torqueNm",
+    "directionStatus",
     "lapCounter",
     "appliedLoad",
     "desiredMass",
@@ -176,6 +177,41 @@ def summarize_lap(source_name: str, rows: list[dict[str, float]]) -> dict[str, A
     wheel_diameter = statistics.median(row["wheelDiameter"] for row in rows)
     speed_tolerance = 0.20 * abs(desired_speed)
     load_tolerance = 3.0
+    motion_threshold = max(1.0, 0.10 * abs(desired_speed))
+    stationary_loaded = [
+        row
+        for row in rows
+        if abs(row["wheelCmPerSec"]) < motion_threshold
+        and abs(row["appliedLoad"] - desired_mass) <= load_tolerance
+    ]
+    if not stationary_loaded:
+        raise RiderDataError(
+            f"{source_name} has no loaded stationary rows for torque baseline correction"
+        )
+    torque_baseline_by_direction = {
+        direction: statistics.median(
+            row["torqueNm"]
+            for row in stationary_loaded
+            if row["directionStatus"] == direction
+        )
+        for direction in sorted({row["directionStatus"] for row in stationary_loaded})
+    }
+    fallback_torque_baseline = statistics.median(
+        row["torqueNm"] for row in stationary_loaded
+    )
+
+    def corrected_abs_torque(row: dict[str, float]) -> float:
+        baseline = torque_baseline_by_direction.get(
+            row["directionStatus"], fallback_torque_baseline
+        )
+        return abs(row["torqueNm"] - baseline)
+
+    steady_controlled = [
+        row
+        for row in active
+        if abs(abs(row["wheelCmPerSec"]) - abs(desired_speed)) <= speed_tolerance
+        and abs(row["appliedLoad"] - desired_mass) <= load_tolerance
+    ]
 
     return {
         "source_name": source_name,
@@ -195,6 +231,22 @@ def summarize_lap(source_name: str, rows: list[dict[str, float]]) -> dict[str, A
         "active_motion_rows": len(active),
         "active_load_kg_reported": describe(row["appliedLoad"] for row in active),
         "active_abs_torque_nm": describe(abs(row["torqueNm"]) for row in active),
+        "stationary_loaded_rows": len(stationary_loaded),
+        "stationary_loaded_torque_nm_by_direction": {
+            f"{direction:g}": describe(
+                row["torqueNm"]
+                for row in stationary_loaded
+                if row["directionStatus"] == direction
+            )
+            for direction in torque_baseline_by_direction
+        },
+        "active_tare_corrected_abs_torque_nm": describe(
+            corrected_abs_torque(row) for row in active
+        ),
+        "steady_controlled_rows": len(steady_controlled),
+        "steady_tare_corrected_abs_torque_nm": describe(
+            corrected_abs_torque(row) for row in steady_controlled
+        ),
         "active_wheel_speed_m_s": describe(
             abs(row["wheelCmPerSec"]) / 100.0 for row in active
         ),
@@ -225,7 +277,10 @@ def summarize_lap(source_name: str, rows: list[dict[str, float]]) -> dict[str, A
         "interpretation": (
             "Derived carriage speed and slip use de-duplicated timestamps and reject "
             "nonpositive distance, dt outside 0.05-0.50 s, carriage speed above 0.30 m/s, "
-            "wheel speed below 0.01 m/s, and slip outside [-1, 1]."
+            "wheel speed below 0.01 m/s, and slip outside [-1, 1]. Torque correction "
+            "subtracts the same-lap, same-direction median torque measured while the "
+            "loaded wheel was stationary. The residual still includes dynamic rig and "
+            "drivetrain losses and is therefore an upper bound on wheel-soil contact torque."
         ),
     }
 
@@ -246,6 +301,16 @@ def campaign_summary(laps: list[dict[str, Any]]) -> dict[str, Any]:
         for lap in laps
         if lap["derived_slip"]["median"] is not None
     ]
+    corrected_torque = [
+        lap["active_tare_corrected_abs_torque_nm"]["median"]
+        for lap in laps
+        if lap["active_tare_corrected_abs_torque_nm"]["median"] is not None
+    ]
+    steady_corrected_torque = [
+        lap["steady_tare_corrected_abs_torque_nm"]["median"]
+        for lap in laps
+        if lap["steady_tare_corrected_abs_torque_nm"]["median"] is not None
+    ]
     return {
         "lap_count": len(laps),
         "total_distance_m": sum(lap["distance_delta_m"] for lap in laps),
@@ -258,6 +323,20 @@ def campaign_summary(laps: list[dict[str, Any]]) -> dict[str, Any]:
         ),
         "active_abs_torque_median_range_nm": range_of(
             ("active_abs_torque_nm", "median")
+        ),
+        "active_tare_corrected_abs_torque_median_range_nm": range_of(
+            ("active_tare_corrected_abs_torque_nm", "median")
+        ),
+        "active_tare_corrected_abs_torque_median_of_lap_medians_nm": (
+            statistics.median(corrected_torque) if corrected_torque else None
+        ),
+        "steady_tare_corrected_abs_torque_median_range_nm": range_of(
+            ("steady_tare_corrected_abs_torque_nm", "median")
+        ),
+        "steady_tare_corrected_abs_torque_median_of_lap_medians_nm": (
+            statistics.median(steady_corrected_torque)
+            if steady_corrected_torque
+            else None
         ),
         "derived_slip_lap_median_range": range_of(("derived_slip", "median")),
         "derived_slip_median_of_lap_medians": (
@@ -302,6 +381,7 @@ def build_reference(zip_path: Path) -> dict[str, Any]:
             "wheelDiameter": "cm in source; converted to m in summary",
             "wheelCmPerSec": "cm/s in source; converted to m/s in summary",
             "torqueNm": "N-m",
+            "directionStatus": "dimensionless direction-state channel",
             "appliedLoad": "kg-equivalent as reported by RIDER",
             "desiredMass": "kg-equivalent as reported by RIDER",
             "derived_slip": "dimensionless, 1 - carriage_speed / wheel_surface_speed",
@@ -318,6 +398,8 @@ def build_reference(zip_path: Path) -> dict[str, Any]:
         "laps": laps,
         "quality_flags": [
             "Applied-load transients substantially exceed the 10 kg desired setting in raw data.",
+            "Raw torque has a large direction-dependent zero-speed offset. Use the direction-conditioned, loaded-stationary baseline-corrected metric for DEM comparison, not raw absolute torque.",
+            "Baseline-corrected torque still includes dynamic drivetrain and rig losses; it is an upper bound on DEM wheel-soil contact torque until an unloaded rotating tare is available.",
             "Repeated timestamps require explicit de-duplication before velocity or slip derivation.",
             "Use synchronized time histories or bounded distributions, not only nominal load and speed, for DEM matching.",
             "The August 13 CPT campaign is a post-traffic spatial contrast because the lane was not fully reset.",

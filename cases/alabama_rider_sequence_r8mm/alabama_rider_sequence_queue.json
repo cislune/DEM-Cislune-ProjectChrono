@@ -1,0 +1,19 @@
+{
+  "calibration_split": "laps 1-5",
+  "frozen_wheel_friction": 0.3,
+  "held_out_validation_split": "laps 6-10",
+  "manifests": [
+    "cases/alabama_rider_sequence_r8mm/alabama-rider-sequence-mu0p3-lap01.json",
+    "cases/alabama_rider_sequence_r8mm/alabama-rider-sequence-mu0p3-lap02.json",
+    "cases/alabama_rider_sequence_r8mm/alabama-rider-sequence-mu0p3-lap03.json",
+    "cases/alabama_rider_sequence_r8mm/alabama-rider-sequence-mu0p3-lap04.json",
+    "cases/alabama_rider_sequence_r8mm/alabama-rider-sequence-mu0p3-lap05.json",
+    "cases/alabama_rider_sequence_r8mm/alabama-rider-sequence-mu0p3-lap06.json",
+    "cases/alabama_rider_sequence_r8mm/alabama-rider-sequence-mu0p3-lap07.json",
+    "cases/alabama_rider_sequence_r8mm/alabama-rider-sequence-mu0p3-lap08.json",
+    "cases/alabama_rider_sequence_r8mm/alabama-rider-sequence-mu0p3-lap09.json",
+    "cases/alabama_rider_sequence_r8mm/alabama-rider-sequence-mu0p3-lap10.json"
+  ],
+  "schema_version": 1,
+  "state_transfer": "each lap imports the preceding lap final soil state"
+}

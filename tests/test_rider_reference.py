@@ -16,6 +16,7 @@ FIELDS = [
     "wheelCmPerSec",
     "desiredCmPerSec",
     "torqueNm",
+    "directionStatus",
     "lapCounter",
     "appliedLoad",
     "desiredMass",
@@ -30,10 +31,10 @@ def lap_text() -> str:
         [
             dict(zip(FIELDS, row))
             for row in [
-                (0.0, 0.0, 0.0, 38.0, 0.0, 10.0, 0.0, 1, 10.0, 10.0),
-                (0.1, 1.0, 0.08, 38.0, 10.0, 10.0, 3.0, 1, 9.0, 10.0),
-                (0.1, 1.0, 0.08, 38.0, 10.0, 10.0, 3.0, 1, 11.0, 10.0),
-                (0.2, 2.0, 0.08, 38.0, 10.0, 10.0, 4.0, 1, 10.0, 10.0),
+                (0.0, 0.0, 0.0, 38.0, 0.0, 10.0, 2.0, -1.0, 1, 10.0, 10.0),
+                (0.1, 1.0, 0.08, 38.0, 10.0, 10.0, 3.0, -1.0, 1, 9.0, 10.0),
+                (0.1, 1.0, 0.08, 38.0, 10.0, 10.0, 3.0, -1.0, 1, 11.0, 10.0),
+                (0.2, 2.0, 0.08, 38.0, 10.0, 10.0, 4.0, -1.0, 1, 10.0, 10.0),
             ]
         ]
     )
@@ -56,6 +57,13 @@ class RiderReferenceTests(unittest.TestCase):
         self.assertAlmostEqual(lap["distance_delta_m"], 0.02)
         self.assertAlmostEqual(lap["wheel_diameter_m"], 0.38)
         self.assertEqual(lap["active_motion_rows"], 3)
+        self.assertEqual(lap["stationary_loaded_rows"], 1)
+        self.assertAlmostEqual(
+            lap["active_tare_corrected_abs_torque_nm"]["median"], 1.0
+        )
+        self.assertAlmostEqual(
+            lap["steady_tare_corrected_abs_torque_nm"]["median"], 1.0
+        )
         self.assertEqual(lap["derived_interval_count"], 1)
         self.assertAlmostEqual(lap["derived_slip"]["median"], 0.0)
         self.assertEqual(result["campaign_summary"]["lap_count"], 1)

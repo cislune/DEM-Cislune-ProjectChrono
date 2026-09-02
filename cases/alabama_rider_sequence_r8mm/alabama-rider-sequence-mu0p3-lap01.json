@@ -3,39 +3,7 @@
     "density_gate_affects_status": false,
     "minimum_lane_particles": 5
   },
-  "calibration_target": {
-    "fit_parameters": [
-      "terrain.wheel_friction"
-    ],
-    "frozen_soil_parameters_from": {
-      "density_gate_status": "PASS_DENSITY",
-      "post_release_bulk_density_kg_m3": 1654.2078782100054,
-      "q100_ratio_predicted_to_observed": 0.970104009174288,
-      "ranking_file": "/Users/erikfranks/Documents/Codex/2026-07-02/get/work/grasp/dem/DEM-Cislune-ProjectChrono/results/cpt/cpt_calibration_rank.json",
-      "ranking_sha256": "7bb9860444958eaaf9b142b57ad2ea7d65d86a462f5e54633e5c4ad6abcf73bf",
-      "resolution_transfer": {
-        "absolute_prediction_status": "WITHHELD_PENDING_CONVERGENCE_AND_PHYSICAL_VALIDATION",
-        "cpt_particle_radius_m": 0.002,
-        "wheel_particle_radius_m": 0.004
-      },
-      "selected_case_id": "cpt-out-track-e3p8-mu50-rr10-c0-r2mm-shared-bed",
-      "selection_score": 0.9436059348696786
-    },
-    "median_abs_torque_nm": 0.8800000000000001,
-    "median_active_load_kg_reported": 9.05,
-    "median_carriage_speed_m_s": 0.0980000000000074,
-    "median_slip": 0.09119069549774234,
-    "metric": "active_tare_corrected_abs_torque_nm.median",
-    "qualification": "The shared 8 mm bed is below the measured out-track bulk density. RIDER torque is corrected by the same-lap, same-direction loaded-stationary baseline, but still includes dynamic rig losses. The corrected target is therefore an upper bound on wheel-soil torque. This sweep brackets response but cannot close absolute validation.",
-    "raw_median_abs_torque_nm": 3.17,
-    "shared_bed_case_id": "wheel-shared-bed-r8mm-cpt-informed-process-dt5us-margin0p18",
-    "shared_bed_state_sha256": "f43125a9acd2e84d84633b794e8c3a25498fee1cd8c74b05ddd64476e108a7ff",
-    "source_reference": "physical_references/alabama_rider_2026-08-04.json",
-    "source_reference_sha256": "d608a45c0c535c9cf44f25fabff716c8feb1aa97ab927ac9b69a1fd9afb77a16",
-    "split": "Alabama RIDER laps 1-5",
-    "wheel_friction": 0.5
-  },
-  "case_id": "calibrate-alabama-wheel-friction-mu0p5",
+  "case_id": "alabama-rider-sequence-mu0p3-lap01",
   "cpt_calibration_provenance": {
     "density_gate_status": "PASS_DENSITY",
     "post_release_bulk_density_kg_m3": 1654.2078782100054,
@@ -50,7 +18,7 @@
     "selected_case_id": "cpt-out-track-e3p8-mu50-rr10-c0-r2mm-shared-bed",
     "selection_score": 0.9436059348696786
   },
-  "model_status": "cpt_informed_wheel_interface_calibration_pilot",
+  "model_status": "cpt_informed_rider_sequence_pilot",
   "output": {
     "terrain_frame_time_s": 0.0005,
     "terrain_progress_every_n_frames": 10,
@@ -67,8 +35,40 @@
     "comparison_condition": "UCF RIDER Alabama wheel 10 kg-equivalent, 0.1 m/s, approximately 9.4% median slip",
     "reference_json": "physical_references/alabama_rider_2026-08-04.json"
   },
-  "purpose": "With CPT-selected soil parameters fixed, fit only wheel-soil friction against UCF Alabama RIDER laps 1-5 median torque. The 8 mm shared bed is a computational pilot and retains an explicit density-mismatch gate.",
+  "purpose": "Run a bounded coupon at the measured Alabama RIDER lap 1 load, speed, and slip with wheel friction frozen at 0.3. Soil state is chained lap to lap so laps 6-10 remain held out from parameter selection.",
   "schema_version": 1,
+  "sequence_condition": {
+    "frozen_soil_parameters_from": {
+      "density_gate_status": "PASS_DENSITY",
+      "post_release_bulk_density_kg_m3": 1654.2078782100054,
+      "q100_ratio_predicted_to_observed": 0.970104009174288,
+      "ranking_file": "/Users/erikfranks/Documents/Codex/2026-07-02/get/work/grasp/dem/DEM-Cislune-ProjectChrono/results/cpt/cpt_calibration_rank.json",
+      "ranking_sha256": "7bb9860444958eaaf9b142b57ad2ea7d65d86a462f5e54633e5c4ad6abcf73bf",
+      "resolution_transfer": {
+        "absolute_prediction_status": "WITHHELD_PENDING_CONVERGENCE_AND_PHYSICAL_VALIDATION",
+        "cpt_particle_radius_m": 0.002,
+        "wheel_particle_radius_m": 0.004
+      },
+      "selected_case_id": "cpt-out-track-e3p8-mu50-rr10-c0-r2mm-shared-bed",
+      "selection_score": 0.9436059348696786
+    },
+    "frozen_wheel_friction": 0.3,
+    "lap": 1,
+    "measured_median_active_load_kg_reported": 9.05,
+    "measured_median_carriage_speed_m_s": 0.09668181818181591,
+    "measured_median_slip": 0.08421148597630501,
+    "measured_raw_median_abs_torque_nm": 3.17,
+    "measured_steady_tare_corrected_median_abs_torque_nm": 0.6549999999999998,
+    "measured_tare_corrected_median_abs_torque_nm": 0.9300000000000002,
+    "prior_case_id": null,
+    "sequence": "UCF Alabama RIDER 2026-08-04",
+    "shared_bed_case_id": "wheel-shared-bed-r8mm-cpt-informed-process-dt5us-margin0p18",
+    "shared_bed_state_sha256": "f43125a9acd2e84d84633b794e8c3a25498fee1cd8c74b05ddd64476e108a7ff",
+    "source_reference": "physical_references/alabama_rider_2026-08-04.json",
+    "source_reference_sha256": "d608a45c0c535c9cf44f25fabff716c8feb1aa97ab927ac9b69a1fd9afb77a16",
+    "split": "calibration",
+    "torque_qualification": "Direction-conditioned loaded-stationary baseline correction; residual includes dynamic rig losses and is an upper bound on wheel-soil torque."
+  },
   "shared_sample_preparation": {
     "achieved_to_target_ratio": 0.8049416440954134,
     "post_release_bulk_density_kg_m3": 1370.9852956027285,
@@ -111,7 +111,7 @@
     "target_settled_bed_height_m": 0.075,
     "time_step_s": 5e-06,
     "wheel_cohesion": 0.0,
-    "wheel_friction": 0.5,
+    "wheel_friction": 0.3,
     "wheel_restitution": 0.2,
     "youngs_modulus_pa": 300000000.0
   },
@@ -119,11 +119,11 @@
     "duration_s": 1.2,
     "gravity_m_s2": 9.81,
     "kinematics_mode": "fixed_linear_speed",
-    "linear_speed_m_s": 0.0980000000000074,
+    "linear_speed_m_s": 0.09668181818181591,
     "normal_load_n": 88.75018250000001,
     "passes": 1,
     "slip_ratios": [
-      0.09119069549774234
+      0.08421148597630501
     ]
   },
   "wheel": {

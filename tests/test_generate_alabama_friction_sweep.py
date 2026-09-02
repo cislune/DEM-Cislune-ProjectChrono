@@ -36,6 +36,9 @@ def test_generate_uses_disjoint_physical_split_and_fixed_bed(tmp_path):
                 "laps": [
                     {
                         "active_abs_torque_nm": {"median": 3.0 + index * 0.1},
+                        "active_tare_corrected_abs_torque_nm": {
+                            "median": 0.8 + index * 0.01
+                        },
                         "active_load_kg_reported": {"median": 9.0 + index * 0.1},
                         "derived_slip": {"median": 0.08 + index * 0.001},
                         "derived_carriage_speed_m_s": {"median": 0.1},
@@ -60,7 +63,11 @@ def test_generate_uses_disjoint_physical_split_and_fixed_bed(tmp_path):
     assert generated_queue["held_out_split"] == "Alabama RIDER laps 6-10"
     assert case["terrain"]["initial_state_case_id"] == "fixed-bed"
     assert case["terrain"]["wheel_friction"] == 0.3
-    assert case["calibration_target"]["median_abs_torque_nm"] == 3.2
+    assert case["calibration_target"]["median_abs_torque_nm"] == pytest.approx(0.82)
+    assert (
+        case["calibration_target"]["metric"]
+        == "active_tare_corrected_abs_torque_nm.median"
+    )
     assert case["shared_sample_preparation"]["achieved_to_target_ratio"] < 1.0
 
 
