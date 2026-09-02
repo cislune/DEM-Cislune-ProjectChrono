@@ -8,6 +8,11 @@ CACHE_ROOT=${GRASP_DEM_CACHE_ROOT:-"$HOME/grasp-dem-cache"}
 MAX_WALL_S=${GRASP_DEM_MAX_WALL_S:-}
 CUDA_HOME_IN_CONTAINER=/root/miniconda3/envs/myenv/targets/x86_64-linux
 PYTHON_IN_CONTAINER=/root/miniconda3/envs/myenv/bin/python
+GIT_REVISION=$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || true)
+GIT_DIRTY=0
+if [[ -n $(git -C "$ROOT" status --porcelain --untracked-files=no 2>/dev/null) ]]; then
+    GIT_DIRTY=1
+fi
 
 if [[ $# -lt 1 ]]; then
     echo "usage: $0 MANIFEST [dem_case_runner.py options]" >&2
@@ -71,6 +76,8 @@ set +e
 docker_command=(docker run --rm --cidfile "$cidfile" --gpus all \
     -e CUDA_HOME="$CUDA_HOME_IN_CONTAINER" \
     -e GRASP_DEM_CONTAINER_DIGEST="$digest" \
+    -e GRASP_DEM_GIT_REVISION="$GIT_REVISION" \
+    -e GRASP_DEM_GIT_DIRTY="$GIT_DIRTY" \
     -v "$ROOT:/workspace:ro" \
     -v "$OUTPUT_ROOT:/outputs" \
     -v "$CACHE_ROOT:/root/.nv/ComputeCache" \

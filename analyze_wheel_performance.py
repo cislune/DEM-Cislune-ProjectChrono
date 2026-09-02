@@ -11,7 +11,15 @@ from pathlib import Path
 import statistics
 
 from analyze_dem_output import read_legacy_vtk_points
+from dem_case_runner import source_file_provenance
 from verify_reference_spin import verify as verify_reference_spin
+
+
+ANALYSIS_SOURCE_FILES = (
+    "analyze_dem_output.py",
+    "analyze_wheel_performance.py",
+    "verify_reference_spin.py",
+)
 
 
 def quantile(values: list[float], fraction: float) -> float:
@@ -227,6 +235,9 @@ def analyze(case_dir: Path) -> dict:
         "case_id": case_id,
         "model_status": manifest.get("model_status"),
         "source_model_status": manifest.get("source_model_status"),
+        "analysis_source_provenance": source_file_provenance(
+            Path(__file__).resolve().parent, ANALYSIS_SOURCE_FILES
+        ),
         "status": "PASS_COMPARATIVE_METRICS" if active else "REJECT_NO_WHEEL_CONTACT",
         "analysis_policy": analysis_policy,
         "warnings": [],

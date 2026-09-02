@@ -35,6 +35,15 @@ UNIT_TO_M = {
     "inches": 0.0254,
 }
 
+SIMULATION_SOURCE_FILES = (
+    "config.py",
+    "csv_vtk.py",
+    "dem_case_runner.py",
+    "slipsinkage.py",
+    "terraingeneration.py",
+    "vtk_points.py",
+)
+
 
 class CaseError(ValueError):
     pass
@@ -49,6 +58,9 @@ def sha256_file(path: Path) -> str:
 
 
 def git_revision(project_root: Path) -> str | None:
+    supplied = os.environ.get("GRASP_DEM_GIT_REVISION")
+    if supplied:
+        return supplied
     try:
         return subprocess.check_output(
             ["git", "rev-parse", "HEAD"],
@@ -60,6 +72,40 @@ def git_revision(project_root: Path) -> str | None:
         return None
 
 
+def git_dirty(project_root: Path) -> bool | None:
+    supplied = os.environ.get("GRASP_DEM_GIT_DIRTY")
+    if supplied in {"0", "1"}:
+        return supplied == "1"
+    try:
+        return bool(
+            subprocess.check_output(
+                ["git", "status", "--porcelain", "--untracked-files=no"],
+                cwd=project_root,
+                text=True,
+                stderr=subprocess.DEVNULL,
+            ).strip()
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def source_file_provenance(project_root: Path, names: tuple[str, ...]) -> dict[str, Any]:
+    files = {}
+    combined = hashlib.sha256()
+    for name in sorted(names):
+        path = project_root / name
+        digest = sha256_file(path) if path.is_file() else None
+        files[name] = digest
+        combined.update(name.encode("utf-8"))
+        combined.update(b"\0")
+        combined.update((digest or "MISSING").encode("ascii"))
+        combined.update(b"\0")
+    return {
+        "combined_sha256": combined.hexdigest(),
+        "files": files,
+    }
+
+
 def command_output(command: list[str]) -> str | None:
     try:
         return subprocess.check_output(
@@ -69,7 +115,7 @@ def command_output(command: list[str]) -> str | None:
         return None
 
 
-def runtime_environment() -> dict[str, Any]:
+def runtime_environment(project_root: Path) -> dict[str, Any]:
     try:
         import DEME
 
@@ -98,6 +144,11 @@ def runtime_environment() -> dict[str, Any]:
         "deme_import_error": deme_error,
         "cuda_home": os.environ.get("CUDA_HOME"),
         "container_image_digest": os.environ.get("GRASP_DEM_CONTAINER_DIGEST"),
+        "project_git_revision": git_revision(project_root),
+        "project_git_dirty": git_dirty(project_root),
+        "simulation_source_provenance": source_file_provenance(
+            project_root, SIMULATION_SOURCE_FILES
+        ),
         "gpu": gpu.splitlines() if gpu else [],
     }
 
@@ -915,7 +966,7 @@ def main(argv: list[str] | None = None) -> int:
 
     require_deme()
     (paths["case_dir"] / "runtime_environment.json").write_text(
-        json.dumps(runtime_environment(), indent=2, sort_keys=True) + "\n"
+        json.dumps(runtime_environment(project_root), indent=2, sort_keys=True) + "\n"
     )
     sys.path.insert(0, str(project_root))
     import config

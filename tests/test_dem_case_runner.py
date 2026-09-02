@@ -8,6 +8,17 @@ import dem_case_runner as runner
 
 
 class DemCaseRunnerTests(unittest.TestCase):
+    def test_source_file_provenance_hashes_exact_bytes(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "a.py").write_text("a = 1\n")
+            first = runner.source_file_provenance(root, ("missing.py", "a.py"))
+            (root / "a.py").write_text("a = 2\n")
+            second = runner.source_file_provenance(root, ("missing.py", "a.py"))
+        self.assertIsNone(first["files"]["missing.py"])
+        self.assertNotEqual(first["files"]["a.py"], second["files"]["a.py"])
+        self.assertNotEqual(first["combined_sha256"], second["combined_sha256"])
+
     def test_alabama_case_preflight(self):
         root = Path(__file__).resolve().parents[1]
         manifest = root / "cases" / "alabama_rider_checkout.json"
