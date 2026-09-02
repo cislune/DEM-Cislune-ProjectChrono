@@ -149,6 +149,8 @@ def lane_metrics(
 
 def analyze(case_dir: Path) -> dict:
     manifest = json.loads((case_dir / "frozen_case.json").read_text())
+    runtime_path = case_dir / "runtime_environment.json"
+    runtime = json.loads(runtime_path.read_text()) if runtime_path.is_file() else {}
     analysis_policy = manifest.get("analysis", {})
     case_id = manifest["case_id"]
     slip = float(manifest["test"]["slip_ratios"][0])
@@ -238,6 +240,11 @@ def analyze(case_dir: Path) -> dict:
         "analysis_source_provenance": source_file_provenance(
             Path(__file__).resolve().parent, ANALYSIS_SOURCE_FILES
         ),
+        "simulation_source_provenance": runtime.get(
+            "simulation_source_provenance"
+        ),
+        "project_git_revision": runtime.get("project_git_revision"),
+        "project_git_dirty": runtime.get("project_git_dirty"),
         "status": "PASS_COMPARATIVE_METRICS" if active else "REJECT_NO_WHEEL_CONTACT",
         "analysis_policy": analysis_policy,
         "warnings": [],
