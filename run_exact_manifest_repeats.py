@@ -80,6 +80,24 @@ def analyze_completed_run(project_root: Path, case_dir: Path, manifest: dict) ->
     )
 
 
+def load_prior_rows(summary_path: Path, manifest_path: Path) -> list[dict]:
+    if not summary_path.is_file():
+        return []
+    prior = json.loads(summary_path.read_text())
+    expected_hash = sha256_file(manifest_path)
+    if prior.get("manifest_sha256") != expected_hash:
+        raise RuntimeError(
+            f"Existing repeat summary manifest hash mismatch: {summary_path}"
+        )
+    rows = prior.get("repeats", [])
+    attempts = [
+        int(row["attempt"] if "attempt" in row else row["repeat"]) for row in rows
+    ]
+    if len(attempts) != len(set(attempts)):
+        raise RuntimeError(f"Duplicate attempt IDs in repeat summary: {summary_path}")
+    return rows
+
+
 def summarize(
     manifest_path: Path,
     output_root: Path,
@@ -92,7 +110,7 @@ def summarize(
     completed = [row for row in rows if row.get("completed")]
     torque = variation([row["torque_nm"] for row in completed]) if completed else None
     strain = variation([row["column_strain_proxy"] for row in completed]) if completed else None
-    complete = len(completed) == repeats
+    complete = len(completed) >= repeats
     checks = {
         "torque_cv": {
             "maximum": torque_cv_limit,
@@ -170,9 +188,28 @@ def main() -> int:
     output_root = args.output_root.resolve()
     output_root.mkdir(parents=True, exist_ok=True)
     cache_root = (args.cache_root or (output_root / "_cache")).resolve()
-    rows = []
     summary_path = output_root / "exact-repeat-summary.json"
-    for attempt in range(1, max_attempts + 1):
+    rows = load_prior_rows(summary_path, manifest_path)
+    last_attempt = max(
+        (
+            int(row["attempt"] if "attempt" in row else row["repeat"])
+            for row in rows
+        ),
+        default=0,
+    )
+    summary = summarize(
+        manifest_path,
+        output_root,
+        rows,
+        args.repeats,
+        args.torque_cv_limit,
+        args.column_strain_range_limit,
+        max_attempts,
+    )
+    summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
+    for attempt in range(last_attempt + 1, max_attempts + 1):
+        if summary["completed_repeats"] >= args.repeats:
+            break
         repeat_root = output_root / f"r{attempt:02d}"
         seed = link_seed_state(manifest, args.seed_case.resolve(), repeat_root)
         case_dir = repeat_root / manifest["case_id"]
@@ -243,8 +280,6 @@ def main() -> int:
             max_attempts,
         )
         summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
-        if summary["completed_repeats"] >= args.repeats:
-            break
 
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0 if summary["completed_repeats"] >= args.repeats else 1

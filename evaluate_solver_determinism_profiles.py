@@ -12,6 +12,13 @@ import statistics
 
 def evaluate(root: Path) -> dict:
     profiles = []
+    launch_path = root / "launch-summary.json"
+    launch_rows = (
+        json.loads(launch_path.read_text()).get("profiles", [])
+        if launch_path.is_file()
+        else []
+    )
+    launch_by_profile = {row["profile"]: row for row in launch_rows}
     for path in sorted(root.glob("*/exact-repeat-summary.json")):
         summary = json.loads(path.read_text())
         torque = summary.get("torque_nm") or {}
@@ -26,14 +33,27 @@ def evaluate(root: Path) -> dict:
         attempts_allowed = summary.get(
             "attempts_allowed", summary.get("repeats_requested", attempts_recorded)
         )
+        launch = launch_by_profile.get(profile, {})
+        failed_attempts = launch.get(
+            "failed_solver_launches",
+            attempts_recorded - summary["completed_repeats"],
+        )
+        attempts_recorded = max(
+            attempts_recorded,
+            summary["completed_repeats"] + failed_attempts,
+        )
         profiles.append(
             {
                 "profile": profile,
                 "status": summary["status"],
                 "completed_repeats": summary["completed_repeats"],
-                "failed_attempts": attempts_recorded - summary["completed_repeats"],
+                "failed_attempts": failed_attempts,
                 "attempts_recorded": attempts_recorded,
                 "attempts_allowed": attempts_allowed,
+                "setup_rejections": launch.get("setup_rejections", 0),
+                "interrupted_before_solver_progress": launch.get(
+                    "interrupted_before_solver_progress", 0
+                ),
                 "torque_cv": torque.get("coefficient_of_variation"),
                 "column_strain_range": strain.get("range"),
                 "median_wall_duration_s": (
@@ -63,8 +83,10 @@ def evaluate(root: Path) -> dict:
         ),
         "qualification": (
             "Short exact-manifest execution gate only. Physical calibration and bed-to-bed "
-            "robustness remain separate validation steps."
+            "robustness remain separate validation steps. Setup rejections and operator/service "
+            "interruptions are excluded from failed solver-launch counts."
         ),
+        "launch_summary_json": str(launch_path) if launch_path.is_file() else None,
         "profiles": profiles,
     }
 

@@ -89,16 +89,30 @@ def plot(
         max(3.55, max(c + f for c, f in zip(completion, failed)) + 0.65),
     )
     axes[0].axhline(3, color="#44515A", linewidth=1.0, linestyle="--")
-    axes[0].legend(frameon=False, loc="upper left")
     for bar, value, failures in zip(bars, completion, failed):
-        axes[0].text(
-            bar.get_x() + bar.get_width() / 2,
-            value + failures + 0.08,
-            f"{value} ok / {failures} failed",
-            ha="center",
-            va="bottom",
-            fontsize=9,
-        )
+        center = bar.get_x() + bar.get_width() / 2
+        if value:
+            axes[0].text(
+                center,
+                value / 2,
+                f"{value} OK",
+                ha="center",
+                va="center",
+                fontsize=9,
+                color="white",
+                fontweight="bold",
+            )
+        if failures:
+            axes[0].text(
+                center,
+                value + failures / 2,
+                f"{failures} FAIL",
+                ha="center",
+                va="center",
+                fontsize=8,
+                color="#44515A",
+                fontweight="bold",
+            )
 
     bars = axes[1].bar(labels, torque_cv, color=colors, width=0.62)
     axes[1].set_title("Torque repeatability", loc="left", fontweight="bold")

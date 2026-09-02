@@ -1,4 +1,14 @@
-from run_exact_manifest_repeats import summarize, variation, wheel_run_complete
+import json
+
+import pytest
+
+from run_exact_manifest_repeats import (
+    load_prior_rows,
+    sha256_file,
+    summarize,
+    variation,
+    wheel_run_complete,
+)
 
 
 def test_variation_reports_cv_and_range():
@@ -43,6 +53,38 @@ def test_summary_allows_bounded_replacement_attempts(tmp_path):
     assert result["completed_repeats"] == 3
     assert result["attempts_allowed"] == 6
     assert result["attempts_recorded"] == 4
+
+
+def test_prior_failed_attempt_is_preserved_for_next_launch(tmp_path):
+    manifest = tmp_path / "case.json"
+    manifest.write_text("{}\n")
+    summary = tmp_path / "exact-repeat-summary.json"
+    summary.write_text(
+        json.dumps(
+            {
+                "manifest_sha256": sha256_file(manifest),
+                "repeats": [
+                    {"attempt": 1, "repeat": 1, "completed": False},
+                    {"attempt": 2, "repeat": 2, "completed": True},
+                ],
+            }
+        )
+    )
+
+    rows = load_prior_rows(summary, manifest)
+
+    assert [row["attempt"] for row in rows] == [1, 2]
+    assert max(row["attempt"] for row in rows) + 1 == 3
+
+
+def test_prior_summary_must_match_manifest_hash(tmp_path):
+    manifest = tmp_path / "case.json"
+    manifest.write_text("{}\n")
+    summary = tmp_path / "exact-repeat-summary.json"
+    summary.write_text(json.dumps({"manifest_sha256": "wrong", "repeats": []}))
+
+    with pytest.raises(RuntimeError, match="manifest hash mismatch"):
+        load_prior_rows(summary, manifest)
 
 
 def test_wheel_run_complete_counts_expected_final_states(tmp_path):

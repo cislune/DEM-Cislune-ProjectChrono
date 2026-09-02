@@ -52,3 +52,30 @@ def test_reports_failed_launches_separately_from_completed_repeats(tmp_path):
     assert result["profiles"][0]["completed_repeats"] == 3
     assert result["profiles"][0]["failed_attempts"] == 2
     assert result["profiles"][0]["attempts_allowed"] == 6
+
+
+def test_launch_ledger_excludes_setup_rejections_from_solver_failures(tmp_path):
+    write_summary(tmp_path, "profile-a", "PASS_PROVISIONAL", 0.10, 0.02)
+    (tmp_path / "launch-summary.json").write_text(
+        json.dumps(
+            {
+                "profiles": [
+                    {
+                        "profile": "profile-a",
+                        "successful_launches": 3,
+                        "failed_solver_launches": 1,
+                        "setup_rejections": 4,
+                        "interrupted_before_solver_progress": 1,
+                    }
+                ]
+            }
+        )
+    )
+
+    result = evaluate(tmp_path)
+    profile = result["profiles"][0]
+
+    assert profile["failed_attempts"] == 1
+    assert profile["attempts_recorded"] == 4
+    assert profile["setup_rejections"] == 4
+    assert profile["interrupted_before_solver_progress"] == 1
