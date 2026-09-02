@@ -1,0 +1,62 @@
+{
+  "designs": [
+    {
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "design": "Closed_SIU",
+      "physical_current_reading": 0.23249999999999998,
+      "physical_median_slip": 0.12810226554829585,
+      "result_json": "/home/c3630/grasp-dem-runs/rtgs-ordering-validation-mu0p9-20260901/validate-rtgs-closed_siu-r8mm-frozen/wheel_performance.json",
+      "simulated_median_abs_contact_torque_nm": 6.6781642100670515,
+      "simulated_median_drawbar_to_normal": 0.0383558199853404
+    },
+    {
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "design": "Closed_Scalloped",
+      "physical_current_reading": 0.22,
+      "physical_median_slip": 0.14519543571449045,
+      "result_json": "/home/c3630/grasp-dem-runs/rtgs-ordering-validation-mu0p9-20260901/validate-rtgs-closed_scalloped-r8mm-frozen/wheel_performance.json",
+      "simulated_median_abs_contact_torque_nm": 8.856124215279342,
+      "simulated_median_drawbar_to_normal": 0.060849083234305885
+    },
+    {
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "design": "Closed_Sharp",
+      "physical_current_reading": 0.27,
+      "physical_median_slip": 0.10004368720007761,
+      "result_json": "/home/c3630/grasp-dem-runs/rtgs-ordering-validation-mu0p9-20260901/validate-rtgs-closed_sharp-r8mm-frozen/wheel_performance.json",
+      "simulated_median_abs_contact_torque_nm": 3.519421980737687,
+      "simulated_median_drawbar_to_normal": 0.1368102277843888
+    }
+  ],
+  "mobility_ordering": {
+    "concordant_pair_fraction": 0.6666666666666666,
+    "exact_order_match": false,
+    "physical_high_to_low_performance": [
+      "Closed_Sharp",
+      "Closed_SIU",
+      "Closed_Scalloped"
+    ],
+    "simulated_high_to_low_performance": [
+      "Closed_Sharp",
+      "Closed_Scalloped",
+      "Closed_SIU"
+    ]
+  },
+  "motor_demand_ordering": {
+    "concordant_pair_fraction": 0.0,
+    "exact_order_match": false,
+    "physical_high_to_low_performance": [
+      "Closed_Sharp",
+      "Closed_SIU",
+      "Closed_Scalloped"
+    ],
+    "simulated_high_to_low_performance": [
+      "Closed_Scalloped",
+      "Closed_SIU",
+      "Closed_Sharp"
+    ]
+  },
+  "qualification": "Historical currentReading units and tare are unknown; its ordinal result is reported but weak evidence. Physical slip has known dimensionless units and is compared with simulated drawbar efficiency as a separate mobility ordering. The shared 8 mm bed retains a density mismatch and does not support absolute claims.",
+  "schema_version": 1,
+  "status": "FAIL_MOTOR_DEMAND_ORDER_PARTIAL_MOBILITY_ORDER"
+}

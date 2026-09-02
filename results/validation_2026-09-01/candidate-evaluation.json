@@ -1,0 +1,46 @@
+{
+  "candidates": [
+    {
+      "candidate": "broad_wave_12",
+      "column_strain_proxy": 0.1092139970124281,
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "drawbar_vs_smooth": 0.8665897954317507,
+      "median_abs_contact_torque_nm": 0.9830629659760215,
+      "median_drawbar_to_normal": 0.1386134727610278,
+      "p95_surface_settlement_m": 0.007958164808000004,
+      "result_json": "/home/c3630/grasp-dem-runs/frozen-candidate-screen-mu0p9-20260901/screen-frozen-broad_wave_12-r8mm/wheel_performance.json",
+      "settlement_vs_smooth": 1.2870504832063043,
+      "strain_vs_smooth": 1.293281171057803,
+      "torque_vs_smooth": 1.0397672914922862
+    },
+    {
+      "candidate": "chevron_wave_14",
+      "column_strain_proxy": 0.0955602682352602,
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "drawbar_vs_smooth": 0.4446534203995049,
+      "median_abs_contact_torque_nm": 1.3607840239719295,
+      "median_drawbar_to_normal": 0.07112356399943177,
+      "p95_surface_settlement_m": 0.006995710726000002,
+      "result_json": "/home/c3630/grasp-dem-runs/frozen-candidate-screen-mu0p9-20260901/screen-frozen-chevron_wave_14-r8mm/wheel_performance.json",
+      "settlement_vs_smooth": 1.1313956279491295,
+      "strain_vs_smooth": 1.1315975881354428,
+      "torque_vs_smooth": 1.439275781797459
+    },
+    {
+      "candidate": "smooth_control",
+      "column_strain_proxy": 0.08444721801918725,
+      "density_gate_status": "REJECT_DENSITY_MISMATCH",
+      "drawbar_vs_smooth": 1.0,
+      "median_abs_contact_torque_nm": 0.9454644072955191,
+      "median_drawbar_to_normal": 0.15995280984351778,
+      "p95_surface_settlement_m": 0.006183257698000003,
+      "result_json": "/home/c3630/grasp-dem-runs/frozen-candidate-screen-mu0p9-20260901/screen-frozen-smooth_control-r8mm/wheel_performance.json",
+      "settlement_vs_smooth": 1.0,
+      "strain_vs_smooth": 1.0,
+      "torque_vs_smooth": 1.0
+    }
+  ],
+  "qualification": "All cases share frozen parameters and one terrain realization, but the 8 mm bed fails the physical density gate. Ratios support candidate down-selection only, not absolute compaction prediction.",
+  "schema_version": 1,
+  "status": "COMPLETE"
+}
