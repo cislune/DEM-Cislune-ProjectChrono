@@ -39,13 +39,21 @@ def plot(
     completed = [row for row in triage["profiles"] if row["completed"]]
     if not completed:
         raise ValueError("No completed profiles are available to plot")
+    repeat_rows = []
+    if repeatability and repeatability.get("candidates"):
+        repeat_rows = repeatability["candidates"][0].get("replicates", [])
     labels = [
         PROFILE_LABELS.get(row["execution_profile"], row["execution_profile"])
         for row in completed
     ]
     colors = ["#2F6B5F", "#D18B2C", "#5276A7"][: len(completed)]
 
-    figure, axes = plt.subplots(1, 2, figsize=(11.5, 5.4))
+    panel_count = 3 if repeat_rows else 2
+    figure, axes = plt.subplots(
+        1,
+        panel_count,
+        figsize=(15.2 if repeat_rows else 11.5, 5.4),
+    )
     figure.patch.set_facecolor("#F5F7F8")
     for axis in axes:
         axis.set_facecolor("white")
@@ -93,9 +101,42 @@ def plot(
             color="#8B3E3E",
             linestyle="--",
             linewidth=1.3,
-            label=f"RIDER lap 3: {reference_torque_nm:.3f} N m",
+            label=f"RIDER lap 3, tare-corrected: {reference_torque_nm:.3f} N m",
         )
         axes[1].legend(frameon=False, loc="best")
+
+    if repeat_rows:
+        repeat_rows = sorted(repeat_rows, key=lambda row: row["replicate"])
+        repeat_labels = [f"R{row['replicate']}" for row in repeat_rows]
+        repeat_torque = [row["torque_nm"] for row in repeat_rows]
+        axes[2].plot(
+            repeat_labels,
+            repeat_torque,
+            color="#2F6B5F",
+            marker="o",
+            markersize=8,
+            linewidth=1.6,
+        )
+        axes[2].set_title("Exact CUB repeats", loc="left", fontweight="bold")
+        axes[2].set_ylabel("Median absolute wheel torque (N m)")
+        for label, value in zip(repeat_labels, repeat_torque):
+            axes[2].annotate(
+                f"{value:.3f}",
+                (label, value),
+                xytext=(0, 8),
+                textcoords="offset points",
+                ha="center",
+                fontsize=9,
+            )
+        if reference_torque_nm is not None:
+            axes[2].axhline(
+                reference_torque_nm,
+                color="#8B3E3E",
+                linestyle="--",
+                linewidth=1.3,
+                label="RIDER lap 3",
+            )
+            axes[2].legend(frameon=False, loc="best")
 
     figure.suptitle(
         "GRASP DEM solver stability diagnostic",
