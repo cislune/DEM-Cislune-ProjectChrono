@@ -3,7 +3,8 @@ set -euo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 DEME_VERSION=${DEME_VERSION:-2.3.3}
-TARGET_IMAGE=${TARGET_IMAGE:-"dem-simulation:deme-${DEME_VERSION}"}
+DEME_LABEL=${DEME_LABEL:-"${DEME_VERSION}-fix71"}
+TARGET_IMAGE=${TARGET_IMAGE:-"dem-simulation:deme-${DEME_LABEL}"}
 MANIFEST=${MANIFEST:-cases/solver_determinism_probe_mu1p05_lap03/determinism-probe-alabama-cub.json}
 SEED_CASE=${SEED_CASE:?SEED_CASE must name the imported settled-terrain case directory}
 OUTPUT_ROOT=${OUTPUT_ROOT:?OUTPUT_ROOT must name an isolated version-comparison directory}
@@ -12,7 +13,7 @@ REPEATS=${REPEATS:-3}
 MAX_ATTEMPTS=${MAX_ATTEMPTS:-6}
 MAX_WALL_S=${MAX_WALL_S:-1200}
 SILENCE_TIMEOUT_S=${SILENCE_TIMEOUT_S:-90}
-PROFILE_ROOT="$OUTPUT_ROOT/deme-${DEME_VERSION}-cub"
+PROFILE_ROOT="$OUTPUT_ROOT/deme-${DEME_LABEL}-cub"
 
 mkdir -p "$OUTPUT_ROOT" "$CACHE_ROOT"
 

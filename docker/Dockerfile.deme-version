@@ -1,10 +1,64 @@
 ARG BASE_IMAGE=dem-simulation:latest
+ARG CUDA_DEVEL_IMAGE=docker.io/nvidia/cuda:12.8.1-devel-ubuntu24.04@sha256:4b9ed5fa8361736996499f64ecebf25d4ec37ff56e4d11323ccde10aa36e0c43
+
+FROM ${CUDA_DEVEL_IMAGE} AS builder
+
+ARG DEME_VERSION=2.3.3
+ARG DEME_SDIST_URL=https://files.pythonhosted.org/packages/31/8a/2ae8fd37e207438fd32869b65e449bb5a08bb58b8f8ac39992d4017fe980/deme-2.3.3.tar.gz
+ARG DEME_SDIST_SHA256=6102c236b1d592932d8d4eb189895397211917f4961fffbaa62ba9e82c247e42
+ARG FIX_PATCH_URL=https://github.com/projectchrono/DEM-Engine/commit/6e14a5d7fa5084919c7850fbff6c6b8afc0e475f.patch
+ARG FIX_PATCH_SHA256=a371f78063e30f4b5398beaf773edbac880aa14bd7d3d044f37bf16df083cdd3
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        build-essential \
+        cmake \
+        curl \
+        patch \
+        python3-dev \
+        python3-pip \
+        python3-venv \
+    && python3 -m venv /opt/deme-build \
+    && /opt/deme-build/bin/python -m pip install --no-cache-dir \
+        "cython~=0.29.0" \
+        numpy \
+        pybind11 \
+        setuptools \
+        wheel
+
+RUN curl --fail --location --silent --show-error "$DEME_SDIST_URL" -o /tmp/deme.tar.gz \
+    && echo "$DEME_SDIST_SHA256  /tmp/deme.tar.gz" | sha256sum --check --strict \
+    && tar -xzf /tmp/deme.tar.gz -C /tmp \
+    && curl --fail --location --silent --show-error "$FIX_PATCH_URL" -o /tmp/fix71.patch \
+    && echo "$FIX_PATCH_SHA256  /tmp/fix71.patch" | sha256sum --check --strict \
+    && cd "/tmp/deme-${DEME_VERSION}" \
+    && patch --batch --forward -p1 < /tmp/fix71.patch
+
+ENV CONDA_PREFIX=/root/miniconda3/envs/myenv
+ENV CMAKE_ARGS=-DCMAKE_CUDA_ARCHITECTURES=89
+RUN /opt/deme-build/bin/python -m pip wheel \
+        --no-build-isolation \
+        --no-deps \
+        --wheel-dir /tmp/wheels \
+        "/tmp/deme-${DEME_VERSION}"
+
 FROM ${BASE_IMAGE}
 
 ARG DEME_VERSION=2.3.3
+ARG FIX_SOURCE_REVISION=6e14a5d7fa5084919c7850fbff6c6b8afc0e475f
+ARG FIX_MERGE_REVISION=7fd2636c557832dfb299e7e31d6f0e072a3c0426
+LABEL org.opencontainers.image.title="GRASP DEME fix-71 comparison"
+LABEL org.opencontainers.image.version="${DEME_VERSION}-fix71"
+LABEL org.opencontainers.image.revision="${FIX_MERGE_REVISION}"
+
+COPY --from=builder /tmp/wheels /tmp/deme-wheels
 RUN /root/miniconda3/envs/myenv/bin/python -m pip install \
+        --force-reinstall \
         --no-cache-dir \
-        --upgrade \
-        "deme==${DEME_VERSION}" \
+        --no-deps \
+        /tmp/deme-wheels/*.whl \
     && /root/miniconda3/envs/myenv/bin/python -c \
-        "import DEME, importlib.metadata as m; assert m.version('deme') == '${DEME_VERSION}'; print(DEME.__version__)"
+        "import DEME, importlib.metadata as m; assert m.version('deme') == '${DEME_VERSION}'; print(DEME.__version__)" \
+    && printf 'deme_version=%s\nfix_source_revision=%s\nfix_merge_revision=%s\n' \
+        "$DEME_VERSION" "$FIX_SOURCE_REVISION" "$FIX_MERGE_REVISION" \
+        > /opt/grasp-deme-provenance.txt
