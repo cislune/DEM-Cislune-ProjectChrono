@@ -9,6 +9,7 @@ SEED_CASE=${SEED_CASE:?SEED_CASE must name the imported settled-terrain case dir
 OUTPUT_ROOT=${OUTPUT_ROOT:?OUTPUT_ROOT must name an isolated version-comparison directory}
 CACHE_ROOT=${CACHE_ROOT:-"$OUTPUT_ROOT/_cache"}
 REPEATS=${REPEATS:-3}
+MAX_ATTEMPTS=${MAX_ATTEMPTS:-6}
 MAX_WALL_S=${MAX_WALL_S:-1200}
 SILENCE_TIMEOUT_S=${SILENCE_TIMEOUT_S:-90}
 PROFILE_ROOT="$OUTPUT_ROOT/deme-${DEME_VERSION}-cub"
@@ -31,6 +32,7 @@ python3 "$ROOT/run_exact_manifest_repeats.py" "$ROOT/$MANIFEST" \
     --output-root "$PROFILE_ROOT" \
     --cache-root "$CACHE_ROOT" \
     --repeats "$REPEATS" \
+    --max-attempts "$MAX_ATTEMPTS" \
     --max-wall-s "$MAX_WALL_S" || true
 
 python3 "$ROOT/diagnose_exact_repeat_divergence.py" "$PROFILE_ROOT" \

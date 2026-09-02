@@ -87,6 +87,7 @@ def summarize(
     repeats: int,
     torque_cv_limit: float,
     strain_range_limit: float,
+    max_attempts: int | None = None,
 ) -> dict:
     completed = [row for row in rows if row.get("completed")]
     torque = variation([row["torque_nm"] for row in completed]) if completed else None
@@ -124,6 +125,8 @@ def summarize(
         "output_root": str(output_root),
         "repeats_requested": repeats,
         "completed_repeats": len(completed),
+        "attempts_allowed": max_attempts if max_attempts is not None else repeats,
+        "attempts_recorded": len(rows),
         "torque_nm": torque,
         "column_strain_proxy": strain,
         "quality_gate": checks,
@@ -142,12 +145,20 @@ def main() -> int:
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--cache-root", type=Path)
     parser.add_argument("--repeats", type=int, default=3)
+    parser.add_argument(
+        "--max-attempts",
+        type=int,
+        help="Maximum launches allowed to obtain the requested successful repeats",
+    )
     parser.add_argument("--max-wall-s", type=int, default=1200)
     parser.add_argument("--torque-cv-limit", type=float, default=0.15)
     parser.add_argument("--column-strain-range-limit", type=float, default=0.03)
     args = parser.parse_args()
     if args.repeats < 2:
         parser.error("--repeats must be at least 2")
+    max_attempts = args.max_attempts or args.repeats
+    if max_attempts < args.repeats:
+        parser.error("--max-attempts must be at least --repeats")
 
     project_root = Path(__file__).resolve().parent
     manifest_path = args.manifest.resolve()
@@ -161,8 +172,8 @@ def main() -> int:
     cache_root = (args.cache_root or (output_root / "_cache")).resolve()
     rows = []
     summary_path = output_root / "exact-repeat-summary.json"
-    for repeat in range(1, args.repeats + 1):
-        repeat_root = output_root / f"r{repeat:02d}"
+    for attempt in range(1, max_attempts + 1):
+        repeat_root = output_root / f"r{attempt:02d}"
         seed = link_seed_state(manifest, args.seed_case.resolve(), repeat_root)
         case_dir = repeat_root / manifest["case_id"]
         result_path = case_dir / "wheel_performance.json"
@@ -195,7 +206,8 @@ def main() -> int:
             wall_duration_s = time.monotonic() - started
             analyze_completed_run(project_root, case_dir, manifest)
         row = {
-            "repeat": repeat,
+            "attempt": attempt,
+            "repeat": attempt,
             "completed": result_path.is_file(),
             "container_return_code": return_code,
             "wall_duration_s": wall_duration_s,
@@ -228,11 +240,14 @@ def main() -> int:
             args.repeats,
             args.torque_cv_limit,
             args.column_strain_range_limit,
+            max_attempts,
         )
         summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
+        if summary["completed_repeats"] >= args.repeats:
+            break
 
     print(json.dumps(summary, indent=2, sort_keys=True))
-    return 0 if summary["completed_repeats"] == args.repeats else 1
+    return 0 if summary["completed_repeats"] >= args.repeats else 1
 
 
 if __name__ == "__main__":
