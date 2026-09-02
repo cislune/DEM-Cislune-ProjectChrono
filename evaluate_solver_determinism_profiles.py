@@ -22,11 +22,18 @@ def evaluate(root: Path) -> dict:
             for row in summary["repeats"]
             if row.get("wall_duration_s") is not None
         ]
+        attempts_recorded = summary.get("attempts_recorded", len(summary["repeats"]))
+        attempts_allowed = summary.get(
+            "attempts_allowed", summary.get("repeats_requested", attempts_recorded)
+        )
         profiles.append(
             {
                 "profile": profile,
                 "status": summary["status"],
                 "completed_repeats": summary["completed_repeats"],
+                "failed_attempts": attempts_recorded - summary["completed_repeats"],
+                "attempts_recorded": attempts_recorded,
+                "attempts_allowed": attempts_allowed,
                 "torque_cv": torque.get("coefficient_of_variation"),
                 "column_strain_range": strain.get("range"),
                 "median_wall_duration_s": (

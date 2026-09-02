@@ -45,6 +45,7 @@ def plot(
     labels = [profile_label(row["profile"]) for row in profiles]
     colors = [status_color(row["status"]) for row in profiles]
     completion = [row["completed_repeats"] for row in profiles]
+    failed = [row.get("failed_attempts", 0) for row in profiles]
     torque_cv = [
         100 * row["torque_cv"] if row["torque_cv"] is not None else 0
         for row in profiles
@@ -64,16 +65,36 @@ def plot(
         axis.grid(axis="y", color="#D9DEE2", linewidth=0.8, alpha=0.7)
         axis.tick_params(axis="x", rotation=18)
 
-    bars = axes[0].bar(labels, completion, color=colors, width=0.62)
-    axes[0].set_title("Repeat completion", loc="left", fontweight="bold")
-    axes[0].set_ylabel("Completed exact repeats")
-    axes[0].set_ylim(0, 3.55)
+    bars = axes[0].bar(
+        labels,
+        completion,
+        color=colors,
+        width=0.62,
+        label="Completed",
+    )
+    axes[0].bar(
+        labels,
+        failed,
+        bottom=completion,
+        color="#C8CDD2",
+        edgecolor="#7C8790",
+        hatch="//",
+        width=0.62,
+        label="Failed launch",
+    )
+    axes[0].set_title("Launch outcomes", loc="left", fontweight="bold")
+    axes[0].set_ylabel("Exact-input launches")
+    axes[0].set_ylim(
+        0,
+        max(3.55, max(c + f for c, f in zip(completion, failed)) + 0.65),
+    )
     axes[0].axhline(3, color="#44515A", linewidth=1.0, linestyle="--")
-    for bar, value in zip(bars, completion):
+    axes[0].legend(frameon=False, loc="upper left")
+    for bar, value, failures in zip(bars, completion, failed):
         axes[0].text(
             bar.get_x() + bar.get_width() / 2,
-            value + 0.08,
-            f"{value}/3",
+            value + failures + 0.08,
+            f"{value} ok / {failures} failed",
             ha="center",
             va="bottom",
             fontsize=9,
