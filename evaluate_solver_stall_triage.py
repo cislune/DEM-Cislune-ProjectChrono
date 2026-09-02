@@ -28,6 +28,7 @@ def evaluate(output_root: Path, queue_path: Path) -> dict:
         log_text = log_path.read_text(errors="replace") if log_path else ""
         performance_path = output_root / case_id / "wheel_performance.json"
         completed = performance_path.is_file()
+        performance = json.loads(performance_path.read_text()) if completed else {}
         rows.append(
             {
                 "execution_profile": profile,
@@ -46,6 +47,20 @@ def evaluate(output_root: Path, queue_path: Path) -> dict:
                     r"Wheel frame: \d+, simulated: ([0-9.eE+-]+) s",
                     log_text,
                     float,
+                ),
+                "torque_median_abs_nm": (
+                    performance.get("mobility", {})
+                    .get("torque_y_nm", {})
+                    .get("median_abs")
+                ),
+                "column_strain_proxy": performance.get("lane", {}).get(
+                    "column_strain_proxy"
+                ),
+                "settlement_m": performance.get("lane", {}).get(
+                    "p95_surface_settlement_m"
+                ),
+                "drawbar_over_normal": performance.get("mobility", {}).get(
+                    "median_abs_drawbar_over_normal_load"
                 ),
                 "solver_overrides": manifest["solver_stall_triage"][
                     "solver_overrides"

@@ -36,7 +36,20 @@ def test_evaluate_solver_stall_triage_selects_fastest_completed_profile(tmp_path
         )
         result_dir = output / case_id
         result_dir.mkdir()
-        (result_dir / "wheel_performance.json").write_text("{}")
+        (result_dir / "wheel_performance.json").write_text(
+            json.dumps(
+                {
+                    "mobility": {
+                        "torque_y_nm": {"median_abs": duration / 100.0},
+                        "median_abs_drawbar_over_normal_load": 0.2,
+                    },
+                    "lane": {
+                        "column_strain_proxy": 0.02,
+                        "p95_surface_settlement_m": 0.001,
+                    },
+                }
+            )
+        )
 
     result = evaluate(output, queue)
 
@@ -44,3 +57,5 @@ def test_evaluate_solver_stall_triage_selects_fastest_completed_profile(tmp_path
     assert result["fastest_completed_profile"] == "fixed-cd20"
     assert result["profiles"][0]["last_wheel_frame"] == 50
     assert result["profiles"][0]["last_simulated_time_s"] == 0.05
+    assert result["profiles"][0]["torque_median_abs_nm"] == 4.0
+    assert result["profiles"][0]["column_strain_proxy"] == 0.02
