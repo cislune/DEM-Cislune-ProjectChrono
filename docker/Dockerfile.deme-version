@@ -50,6 +50,8 @@ ARG FIX_MERGE_REVISION=7fd2636c557832dfb299e7e31d6f0e072a3c0426
 LABEL org.opencontainers.image.title="GRASP DEME fix-71 comparison"
 LABEL org.opencontainers.image.version="${DEME_VERSION}-fix71"
 LABEL org.opencontainers.image.revision="${FIX_MERGE_REVISION}"
+ENV CUDA_HOME=/root/miniconda3/envs/myenv/targets/x86_64-linux
+ENV LD_LIBRARY_PATH=/root/miniconda3/envs/myenv/targets/x86_64-linux/lib:/root/miniconda3/envs/myenv/lib
 
 COPY --from=builder /tmp/wheels /tmp/deme-wheels
 RUN /root/miniconda3/envs/myenv/bin/python -m pip install \

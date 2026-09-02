@@ -17,3 +17,4 @@ def test_fix71_image_pins_source_and_patch_hashes():
     assert "a371f78063e30f4b5398beaf773edbac880aa14bd7d3d044f37bf16df083cdd3" in dockerfile
     assert "7fd2636c557832dfb299e7e31d6f0e072a3c0426" in dockerfile
     assert "--force-reinstall" in dockerfile
+    assert "LD_LIBRARY_PATH=/root/miniconda3/envs/myenv/targets/x86_64-linux/lib" in dockerfile
