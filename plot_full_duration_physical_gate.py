@@ -72,7 +72,8 @@ def plot(summary: dict, gate: dict, output_path: Path) -> None:
     )
     axes[0].set_title("Full-duration torque", loc="left", fontweight="bold")
     axes[0].set_ylabel("Predicted wheel torque (N m)")
-    axes[0].legend(frameon=False, fontsize=8, loc="upper left")
+    axes[0].margins(y=0.12)
+    axes[0].legend(frameon=False, fontsize=8, loc="lower right")
 
     normalized = [torque_cv / 0.15, strain_range / 0.03]
     metric_labels = ["Torque CV", "Strain range"]
