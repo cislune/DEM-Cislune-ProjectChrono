@@ -1,0 +1,40 @@
+GRASP DEM REFINEMENT CAMPAIGN
+Launch date: 2026-09-01 Pacific
+
+CURRENT STATE
+
+The first 8 mm campaign is running unattended on the Cislune Dell RTX A4000.
+The complete baseline pilot passed preflight, reference-spin, output-integrity,
+mobility-extraction, and chained-state checks. Absolute compaction remains withheld
+because the shared 8 mm bed reaches only 80.5 percent of measured UCF out-track density.
+
+STAGE 1 SCOPE
+
+- 150 Alabama-wheel cases: 15 ten-lap sequences.
+- Laps 1-5 remain the calibration partition; laps 6-10 remain held out.
+- Wheel-soil friction refinement: 0.75, 0.825, 0.90, 0.975, and 1.05.
+- One-factor sensitivity: particle friction, rolling resistance, Young's modulus,
+  restitution, and integration timestep.
+- 60 candidate cases: ten sequential Alabama load/speed/slip conditions for each of
+  smooth control, broad wave, chevron, two low-grouser variants, and staggered wave.
+- Every candidate starts from the same frozen bed realization and is normalized to
+  smooth control. Alabama physical torque is not treated as a validation target for
+  non-Alabama wheel geometries.
+
+AUTOMATIC SAFEGUARDS
+
+- Every case has a 1,200 second wall-time cap.
+- Completed cases are skipped on restart, allowing safe resume after interruption.
+- The campaign stops before available disk space falls below 30 GB.
+- A failure in one case is recorded and does not discard completed work.
+- Result summaries are regenerated after each completed ten-case block.
+
+NEXT ADAPTIVE STAGE
+
+After Stage 1, retain the baseline material parameters and select wheel friction using
+calibration laps only. Use held-out performance, timestep sensitivity, and candidate
+rank robustness to choose the next expensive runs. The next campaign will use multiple
+bed seeds and a 6 mm particle-resolution bridge, concentrating on smooth control and the
+best two candidate geometries. Additional UCF testing should be requested only after
+these runs identify the smallest physical data set that can resolve the remaining model
+uncertainty.
