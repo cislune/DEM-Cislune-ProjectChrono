@@ -28,7 +28,12 @@ def repeatability_note(summary: dict | None) -> str:
     )
 
 
-def plot(triage: dict, repeatability: dict | None, output_path: Path) -> None:
+def plot(
+    triage: dict,
+    repeatability: dict | None,
+    output_path: Path,
+    reference_torque_nm: float | None = None,
+) -> None:
     import matplotlib.pyplot as plt
 
     completed = [row for row in triage["profiles"] if row["completed"]]
@@ -82,6 +87,15 @@ def plot(triage: dict, repeatability: dict | None, output_path: Path) -> None:
     axes[1].set_title("Same input, different numerical response", loc="left", fontweight="bold")
     axes[1].set_xlabel("Column-strain proxy")
     axes[1].set_ylabel("Median absolute wheel torque (N m)")
+    if reference_torque_nm is not None:
+        axes[1].axhline(
+            reference_torque_nm,
+            color="#8B3E3E",
+            linestyle="--",
+            linewidth=1.3,
+            label=f"RIDER lap 3: {reference_torque_nm:.3f} N m",
+        )
+        axes[1].legend(frameon=False, loc="best")
 
     figure.suptitle(
         "GRASP DEM solver stability diagnostic",
@@ -117,6 +131,7 @@ def main() -> int:
     parser.add_argument("triage_summary", type=Path)
     parser.add_argument("--repeatability-summary", type=Path)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--reference-torque-nm", type=float)
     args = parser.parse_args()
     triage = json.loads(args.triage_summary.read_text())
     repeatability = (
@@ -124,7 +139,12 @@ def main() -> int:
         if args.repeatability_summary
         else None
     )
-    plot(triage, repeatability, args.output)
+    plot(
+        triage,
+        repeatability,
+        args.output,
+        reference_torque_nm=args.reference_torque_nm,
+    )
     print(args.output)
     return 0
 
