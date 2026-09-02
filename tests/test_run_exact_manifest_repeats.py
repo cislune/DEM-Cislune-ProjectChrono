@@ -1,4 +1,4 @@
-from run_exact_manifest_repeats import summarize, variation
+from run_exact_manifest_repeats import summarize, variation, wheel_run_complete
 
 
 def test_variation_reports_cv_and_range():
@@ -25,3 +25,14 @@ def test_summary_rejects_unstable_complete_probe(tmp_path):
     assert result["status"] == "REJECT_QUALITY_GATE"
     assert not result["quality_gate"]["torque_cv"]["pass"]
     assert not result["quality_gate"]["column_strain_range"]["pass"]
+
+
+def test_wheel_run_complete_counts_expected_final_states(tmp_path):
+    case = tmp_path / "case"
+    final = case / "wheel" / "slip" / "pass" / "settled data"
+    final.mkdir(parents=True)
+    (final / "state.csv").write_text("done")
+
+    assert wheel_run_complete(
+        case, {"test": {"slip_ratios": [0.1], "passes": 1}}
+    )

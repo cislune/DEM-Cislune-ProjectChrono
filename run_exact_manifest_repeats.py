@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import statistics
 import subprocess
+import sys
 import time
 
 
@@ -58,6 +59,25 @@ def link_seed_state(manifest: dict, seed_case: Path, repeat_root: Path) -> dict:
         "linked_path": str(target),
         "linked_sha256": sha256_file(target),
     }
+
+
+def wheel_run_complete(case_dir: Path, manifest: dict) -> bool:
+    expected = len(manifest["test"]["slip_ratios"]) * int(
+        manifest["test"].get("passes", 1)
+    )
+    final_states = list(case_dir.glob("wheel/**/settled data/*.csv"))
+    return len(final_states) >= expected
+
+
+def analyze_completed_run(project_root: Path, case_dir: Path, manifest: dict) -> None:
+    if not wheel_run_complete(case_dir, manifest):
+        return
+    subprocess.run(
+        [sys.executable, str(project_root / "analyze_wheel_performance.py"), str(case_dir)],
+        cwd=project_root,
+        stdout=subprocess.DEVNULL,
+        check=False,
+    )
 
 
 def summarize(
@@ -144,9 +164,12 @@ def main() -> int:
     for repeat in range(1, args.repeats + 1):
         repeat_root = output_root / f"r{repeat:02d}"
         seed = link_seed_state(manifest, args.seed_case.resolve(), repeat_root)
-        result_path = repeat_root / manifest["case_id"] / "wheel_performance.json"
+        case_dir = repeat_root / manifest["case_id"]
+        result_path = case_dir / "wheel_performance.json"
         return_code = 0
         wall_duration_s = None
+        if not result_path.is_file():
+            analyze_completed_run(project_root, case_dir, manifest)
         if not result_path.is_file():
             env = os.environ.copy()
             env.update(
@@ -170,6 +193,7 @@ def main() -> int:
                 check=False,
             ).returncode
             wall_duration_s = time.monotonic() - started
+            analyze_completed_run(project_root, case_dir, manifest)
         row = {
             "repeat": repeat,
             "completed": result_path.is_file(),
