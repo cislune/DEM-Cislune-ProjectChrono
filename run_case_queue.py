@@ -37,6 +37,12 @@ def completed(project_root: Path, kind: str, case_id: str, env: dict[str, str]) 
     return health.is_file()
 
 
+def case_output_root(kind: str, case_id: str, env: dict[str, str]) -> Path:
+    variable = "GRASP_CPT_OUTPUT_ROOT" if kind == "cpt" else "GRASP_DEM_OUTPUT_ROOT"
+    default = Path.home() / ("grasp-cpt-runs" if kind == "cpt" else "grasp-dem-runs")
+    return Path(env.get(variable, str(default))) / case_id
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("queue", type=Path)
@@ -56,6 +62,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--select", help="1-based comma-separated queue entries")
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument(
+        "--overwrite-incomplete",
+        action="store_true",
+        help="replace an existing case directory only when its final health file is absent",
+    )
     parser.add_argument("--continue-on-error", action="store_true")
     parser.add_argument(
         "--max-wall-s",
@@ -89,16 +100,22 @@ def main() -> int:
     for index in selection:
         manifest = project_root / manifests[index]
         case_id = json.loads(manifest.read_text())["case_id"]
+        is_completed = completed(project_root, args.kind, case_id, env)
         if (
             args.stage == "all"
-            and completed(project_root, args.kind, case_id, env)
+            and is_completed
             and not args.overwrite
         ):
             print(f"SKIP completed: {case_id}", flush=True)
             outcomes.append({"case_id": case_id, "status": "SKIPPED_COMPLETED"})
             continue
         command = [str(wrapper), str(manifest), "--stage", args.stage]
-        if args.overwrite:
+        overwrite_incomplete = (
+            args.overwrite_incomplete
+            and not is_completed
+            and case_output_root(args.kind, case_id, env).exists()
+        )
+        if args.overwrite or overwrite_incomplete:
             command.append("--overwrite")
         print(f"RUN {index + 1}/{len(manifests)}: {case_id}", flush=True)
         started = time.time()
@@ -107,6 +124,7 @@ def main() -> int:
             "case_id": case_id,
             "exit_status": result.returncode,
             "elapsed_s": time.time() - started,
+            "overwrote_incomplete": overwrite_incomplete,
         }
         outcomes.append(outcome)
         print(json.dumps(outcome, sort_keys=True), flush=True)

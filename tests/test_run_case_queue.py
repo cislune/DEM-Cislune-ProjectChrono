@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import patch
+from pathlib import Path
 
 import run_case_queue as queue
 
@@ -32,6 +33,27 @@ class RunCaseQueueTests(unittest.TestCase):
             ["run_case_queue.py", "queue.json", "--kind", "wheel", "--max-wall-s", "300"],
         ):
             self.assertEqual(queue.parse_args().max_wall_s, 300)
+
+    def test_overwrite_incomplete_is_opt_in(self):
+        with patch(
+            "sys.argv",
+            [
+                "run_case_queue.py",
+                "queue.json",
+                "--kind",
+                "wheel",
+                "--overwrite-incomplete",
+            ],
+        ):
+            self.assertTrue(queue.parse_args().overwrite_incomplete)
+
+    def test_case_output_root_uses_kind_specific_environment(self):
+        self.assertEqual(
+            queue.case_output_root(
+                "wheel", "case-1", {"GRASP_DEM_OUTPUT_ROOT": "/tmp/dem"}
+            ),
+            Path("/tmp/dem/case-1"),
+        )
 
 
 if __name__ == "__main__":
