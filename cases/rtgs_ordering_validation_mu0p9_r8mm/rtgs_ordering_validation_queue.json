@@ -1,0 +1,10 @@
+{
+  "comparison": "Rank DEM median wheel-contact torque against historical median motor-current ordering.",
+  "frozen_wheel_friction": 0.9,
+  "manifests": [
+    "cases/rtgs_ordering_validation_mu0p9_r8mm/validate-rtgs-closed_sharp-r8mm-frozen.json",
+    "cases/rtgs_ordering_validation_mu0p9_r8mm/validate-rtgs-closed_scalloped-r8mm-frozen.json",
+    "cases/rtgs_ordering_validation_mu0p9_r8mm/validate-rtgs-closed_siu-r8mm-frozen.json"
+  ],
+  "schema_version": 1
+}

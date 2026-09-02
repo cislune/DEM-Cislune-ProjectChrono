@@ -1,0 +1,10 @@
+{
+  "comparison": "Shared-condition geometry screen; normalize to smooth control.",
+  "frozen_wheel_friction": 0.9,
+  "manifests": [
+    "cases/frozen_candidate_screen_mu0p9_r8mm/screen-frozen-smooth_control-r8mm.json",
+    "cases/frozen_candidate_screen_mu0p9_r8mm/screen-frozen-broad_wave_12-r8mm.json",
+    "cases/frozen_candidate_screen_mu0p9_r8mm/screen-frozen-chevron_wave_14-r8mm.json"
+  ],
+  "schema_version": 1
+}
