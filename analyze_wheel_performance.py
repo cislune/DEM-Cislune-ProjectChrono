@@ -176,6 +176,27 @@ def analyze(case_dir: Path) -> dict:
                     {"pass": pass_number, "frame": frame, **contact_metrics(path, centers[frame])}
                 )
     active = [item for item in frame_metrics if item["contacts"] > 0]
+    mobility_by_pass = []
+    for pass_number in range(1, len(run_roots) + 1):
+        pass_active = [item for item in active if item["pass"] == pass_number]
+        pass_torque = [float(item["torque_y_nm"]) for item in pass_active]
+        pass_drawbar = [float(item["force_x_n"]) for item in pass_active]
+        pass_vertical = [float(item["force_z_n"]) for item in pass_active]
+        mobility_by_pass.append(
+            {
+                "pass": pass_number,
+                "active_contact_frames": len(pass_active),
+                "torque_y_nm": describe(pass_torque),
+                "drawbar_force_x_n": describe(pass_drawbar),
+                "vertical_contact_force_n": describe(pass_vertical),
+                "median_abs_drawbar_over_normal_load": (
+                    statistics.median(abs(value) for value in pass_drawbar)
+                    / float(manifest["test"]["normal_load_n"])
+                    if pass_drawbar
+                    else None
+                ),
+            }
+        )
     first_centers = centers_by_pass[0]
     first_center = first_centers[min(first_centers)]
     last_center = first_centers[max(first_centers)]
@@ -225,6 +246,7 @@ def analyze(case_dir: Path) -> dict:
                 else None
             ),
         },
+        "mobility_by_pass": mobility_by_pass,
         "reference_spin_gate": reference_spin_gate,
         "interpretation": (
             "These metrics compare identically configured shapes. The lane strain proxy includes "

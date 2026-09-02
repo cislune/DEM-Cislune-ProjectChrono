@@ -433,7 +433,33 @@ def preflight_case(
         warnings.append("wheel restitution exceeds 0.5; verify against calibration")
 
     initial_state_path = None
-    if terrain.get("initial_state_csv"):
+    initial_state_case_id = terrain.get("initial_state_case_id")
+    if initial_state_case_id:
+        initial_state_case_id = str(initial_state_case_id)
+        if Path(initial_state_case_id).name != initial_state_case_id:
+            failures.append("initial_state_case_id must be a plain case identifier")
+        else:
+            initial_state_filename = terrain.get(
+                "initial_state_filename", "settled_terrain_data.csv"
+            )
+            if Path(initial_state_filename).name != initial_state_filename:
+                failures.append("initial_state_filename must be a plain filename")
+            else:
+                initial_state_path = (
+                    output_root
+                    / initial_state_case_id
+                    / "terrain"
+                    / "settled terrain data"
+                    / initial_state_filename
+                )
+                if initial_state_path.is_file():
+                    case["_resolved_initial_state_csv"] = str(initial_state_path)
+                else:
+                    failures.append(
+                        f"Initial terrain state not found for case {initial_state_case_id}: "
+                        f"{initial_state_path}"
+                    )
+    elif terrain.get("initial_state_csv"):
         try:
             initial_state_path = resolve_obj_path(
                 project_root, case_path, terrain["initial_state_csv"]

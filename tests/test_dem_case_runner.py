@@ -112,6 +112,29 @@ f 2 7 6
         self.assertEqual(preparation["target_bulk_density_kg_m3"], 1703.2)
         self.assertEqual(preparation["post_release_bulk_density_kg_m3"], 1654.2)
 
+    def test_initial_state_case_id_resolves_inside_output_root(self):
+        root = Path(__file__).resolve().parents[1]
+        source_manifest = root / "cases" / "alabama_rider_smoke.json"
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_root = Path(temp_dir)
+            state = (
+                output_root
+                / "fixed-bed"
+                / "terrain"
+                / "settled terrain data"
+                / "settled_terrain_data.csv"
+            )
+            state.parent.mkdir(parents=True)
+            state.write_text("X,Y,Z,clump_type\n0,0,0,t0\n")
+            manifest = output_root / "portable.json"
+            case = json.loads(source_manifest.read_text())
+            case["case_id"] = "portable"
+            case["terrain"]["initial_state_case_id"] = "fixed-bed"
+            manifest.write_text(json.dumps(case))
+            frozen, _, report = runner.preflight_case(manifest, root, output_root)
+        self.assertEqual(report["status"], "PASS")
+        self.assertEqual(frozen["_resolved_initial_state_csv"], str(state))
+
 
 if __name__ == "__main__":
     unittest.main()
