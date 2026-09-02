@@ -1,0 +1,10 @@
+ARG BASE_IMAGE=dem-simulation:latest
+FROM ${BASE_IMAGE}
+
+ARG DEME_VERSION=2.3.3
+RUN /root/miniconda3/envs/myenv/bin/python -m pip install \
+        --no-cache-dir \
+        --upgrade \
+        "deme==${DEME_VERSION}" \
+    && /root/miniconda3/envs/myenv/bin/python -c \
+        "import DEME, importlib.metadata as m; assert m.version('deme') == '${DEME_VERSION}'; print(DEME.__version__)"
