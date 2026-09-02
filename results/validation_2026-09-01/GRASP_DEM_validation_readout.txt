@@ -1,0 +1,75 @@
+GRASP DEM WHEEL CALIBRATION AND VALIDATION
+Run date: 2026-09-01
+
+DECISION
+
+Use wheel-soil friction 0.90 for the current 8 mm pilot model. Print and test the
+broad-wave candidate beside the smooth control. Do not advance the chevron candidate
+from this screen. Continue using DEM torque and normalized geometry comparisons, but
+withhold absolute compaction predictions until the terrain bed is density matched at
+finer particle resolution.
+
+PHYSICAL EVIDENCE USED
+
+- UCF Alabama RIDER, 10 laps, 2026-08-04: measured load, speed, torque, and derived slip.
+- UCF Alabama CPT, 2026-08-13: out-track baseline and post-traffic in-track spatial contrast.
+- Historical RTGS RIDER campaigns: Closed Sharp, Closed SIU, and Closed Scalloped wheels.
+- Exact Alabama and controlled CRATR collision meshes plus smooth, broad-wave, and chevron OBJ files.
+
+TORQUE CALIBRATION
+
+Raw Alabama torque is not a valid DEM target by itself. The raw torque channel has a
+large direction-dependent stationary offset near 3 N m. Each lap was corrected by its
+same-direction, loaded-stationary median. The corrected residual still includes dynamic
+rig and drivetrain losses and is therefore an upper bound on wheel-soil contact torque.
+
+Calibration used laps 1-5 only. At frozen wheel-soil friction 0.90, the five-lap median
+DEM contact torque was 0.913 N m versus the 0.880 N m corrected RIDER upper bound, a
+3.7 percent error.
+
+HELD-OUT VALIDATION
+
+Laps 6-10 were not used to select friction. Their median DEM torque was 0.928 N m versus
+0.960 N m observed, a 3.4 percent error. Four of five laps were within 20 percent. Lap 10
+was a retained outlier at 2.873 N m predicted versus 1.13 N m observed. The torque result
+is classified PASS_MEDIAN_WITH_OUTLIER, not an unqualified pass.
+
+COMPACTION LIMITATION
+
+The 8 mm shared terrain bed achieved only 80.5 percent of the measured UCF out-track
+bulk density, so it fails the density gate. The chained DEM column-density proxy reached
+1.278 after ten passes versus the UCF in-track/out-track bulk-density ratio of 1.140.
+UCF q100 increased 7.734 times, but the present wheel run does not simulate an in-track
+CPT and cannot claim that resistance ratio. Compaction results are directional and
+comparative only until a finer density-matched bed is run.
+
+HISTORICAL RTGS CHECK
+
+The uncalibrated historical current channel gives physical demand order Sharp > SIU >
+Scalloped, while DEM torque gives Scalloped > SIU > Sharp. This strict motor-demand
+ordering check failed. Current units and tare are undocumented and should not be used for
+future calibration without the controller record.
+
+Using known-unit mobility evidence, physical slip ranks Sharp > SIU > Scalloped and DEM
+drawbar efficiency ranks Sharp > Scalloped > SIU. Two of three pairwise relationships are
+correct, and both methods select Sharp as the best of the historical group.
+
+FROZEN CANDIDATE SCREEN
+
+Relative to the smooth control under identical frozen conditions:
+
+- Broad wave: 1.287x settlement, 1.293x column strain, 1.040x torque, 0.867x drawbar efficiency.
+- Chevron: 1.131x settlement, 1.132x column strain, 1.439x torque, 0.445x drawbar efficiency.
+
+Broad wave is the best compaction/mobility trade in this bounded screen. Smooth is the
+required control. Chevron is dominated by broad wave on settlement, torque, and drawbar.
+
+NEXT TEST
+
+1. Print broad wave and smooth control at the same diameter, width, hub interface, and material.
+2. Run matched CRATR trials at the Alabama calibration load, speed, and slip condition.
+3. Record rotating no-load torque/current tare before soil contact, then synchronized load,
+   torque/current, speed, travel, slip, sinkage, and track geometry for every pass.
+4. Take paired pre-traffic and post-traffic penetrometer measurements at registered locations.
+5. Restore Ada access and repeat the DEM comparison at 4 mm, then 2 mm if memory permits,
+   accepting absolute compaction only after the bed-density and resolution-convergence gates pass.
