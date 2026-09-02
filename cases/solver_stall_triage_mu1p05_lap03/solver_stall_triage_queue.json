@@ -1,0 +1,25 @@
+{
+  "campaign": "solver stall execution-profile diagnostic",
+  "manifests": [
+    "cases/solver_stall_triage_mu1p05_lap03/stall-triage-cub-alabama-sensitivity-wheel_mu1p05-lap03.json",
+    "cases/solver_stall_triage_mu1p05_lap03/stall-triage-fixed-cd20-alabama-sensitivity-wheel_mu1p05-lap03.json",
+    "cases/solver_stall_triage_mu1p05_lap03/stall-triage-cub-fixed-cd20-alabama-sensitivity-wheel_mu1p05-lap03.json"
+  ],
+  "profiles": {
+    "cub": {
+      "use_cub_force_collection": true
+    },
+    "cub-fixed-cd20": {
+      "cd_update_frequency": 20,
+      "disable_adaptive_update_frequency": true,
+      "use_cub_force_collection": true
+    },
+    "fixed-cd20": {
+      "cd_update_frequency": 20,
+      "disable_adaptive_update_frequency": true
+    }
+  },
+  "schema_version": 1,
+  "seed_case_id": "alabama-sensitivity-wheel_mu1p05-lap02",
+  "source_case_id": "alabama-sensitivity-wheel_mu1p05-lap03"
+}
