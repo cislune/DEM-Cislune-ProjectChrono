@@ -96,6 +96,27 @@ withheld until a physical run records bed preparation, pre/post geotechnical
 response at fixed offsets, rut geometry, wheel geometry, load, speed, slip, and
 lap sequence.
 
+### Current Alabama Calibration Boundary
+
+The 2026-09-02 full-duration bracket held the imported lap-2 bed, Alabama wheel,
+load, speed, slip, timestep, geometry, DEME build, and CD1 execution profile
+fixed while varying only wheel friction. All outputs passed the provisional
+numerical gate and the independent-file audit, but all exceeded the RIDER-based
+physical rejection threshold of 0.843 N m.
+
+| Wheel friction | Median torque (N m) | Torque CV | Strain-proxy range | Gate |
+|---:|---:|---:|---:|---|
+| 0.75 | 0.978 | 1.39% | 0.0220 | Reject: torque above physical upper bound |
+| 0.90 | 1.189 | 8.37% | 0.0236 | Reject: torque above physical upper bound |
+| 1.05 | 1.014 | 8.38% | 0.00175 | Reject: torque above physical upper bound |
+
+Do not continue lowering wheel friction or resume candidate ranking on this
+underdense imported bed. The next gate is the deterministic 4 mm-radius
+terrain-preparation sweep in `cases/density_margin_r4mm_cd1`, followed by
+independent seed repeats at the selected compression-release margin. A bed may
+advance only when every seed is within 3% of the physical target bulk density
+and the seed-to-seed density coefficient of variation is no greater than 3%.
+
 ## Tests
 
 ```bash
